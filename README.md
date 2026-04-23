@@ -44,7 +44,7 @@ https://script.google.com/home/projects/<scriptId>/edit
 - run `clasp login`
 
 If you run `npm run setup` without arguments, the setup script will ask for the Apps Script URL or `scriptId` interactively and explain where to find it.
-The interactive flow is step-by-step: it shows one action, waits for your response, and then moves to the next step.
+The interactive flow is one input per step: each step waits for your response before moving on.
 
 #### よく使うコマンド
 

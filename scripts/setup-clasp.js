@@ -79,22 +79,20 @@ async function promptScriptId() {
       rl.question(message, resolve);
     });
 
+  const waitForEnter = async (step, message) => {
+    await question(`Step ${step}: ${message} Press Enter to continue. `);
+  };
+
   console.log('');
   console.log('Interactive setup');
   console.log('');
-  await question('Step 1: Open your spreadsheet, then press Enter. ');
-  await question('Step 2: Open Extensions > Apps Script, then press Enter. ');
-  console.log('');
-  console.log('Step 3: In the Apps Script editor, copy either:');
-  console.log('- the full editor URL');
-  console.log('- or the raw scriptId between /projects/ and /edit');
-  console.log('Example: https://script.google.com/home/projects/<scriptId>/edit');
-  console.log('');
+  await waitForEnter(1, 'Open your spreadsheet.');
+  await waitForEnter(2, 'Open Extensions > Apps Script.');
+  await question(
+    'Step 3: In the Apps Script editor, copy the full URL or the raw scriptId between /projects/ and /edit. Example: https://script.google.com/home/projects/<scriptId>/edit\nPress Enter after you have checked this. '
+  );
   const answer = await question('Step 4: Paste the Apps Script URL or Project ID: ');
-  console.log('');
-  console.log('Step 5: Before your first push, you need to enable Google Apps Script API.');
-  console.log('Open: https://script.google.com/home/usersettings');
-  console.log('');
+  await waitForEnter(5, 'Open https://script.google.com/home/usersettings and make sure Google Apps Script API is enabled.');
 
   rl.close();
   return answer;
