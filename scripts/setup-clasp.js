@@ -16,15 +16,34 @@ function writeConfig(scriptId) {
   fs.writeFileSync(outputPath, content, 'utf8');
 }
 
+function normalizeScriptId(value) {
+  if (typeof value !== 'string') {
+    return '';
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed || trimmed.includes('REPLACE_WITH')) {
+    return '';
+  }
+
+  const urlMatch = trimmed.match(/\/projects\/([a-zA-Z0-9_-]+)\//);
+  if (urlMatch && urlMatch[1]) {
+    return urlMatch[1];
+  }
+
+  return trimmed;
+}
+
 function isValidScriptId(value) {
-  return typeof value === 'string' && value.trim().length > 10 && !value.includes('REPLACE_WITH');
+  const normalized = normalizeScriptId(value);
+  return normalized.length > 10;
 }
 
 function printUsage() {
   console.log('');
-  console.log('Usage: npm run setup-clasp -- <scriptId>');
-  console.log('Or run without arguments to enter the scriptId interactively.');
-  console.log('You can find the scriptId in the Apps Script editor URL:');
+  console.log('Usage: npm run setup-clasp -- <Apps Script URL or scriptId>');
+  console.log('Or run without arguments to enter it interactively.');
+  console.log('You can paste the Apps Script editor URL directly:');
   console.log('https://script.google.com/home/projects/<scriptId>/edit');
   console.log('');
 }
@@ -45,21 +64,22 @@ async function promptScriptId() {
   console.log('1. Open your spreadsheet.');
   console.log('2. Go to Extensions > Apps Script.');
   console.log('3. Look at the browser URL in the Apps Script editor.');
-  console.log('4. Copy the part between /projects/ and /edit.');
+  console.log('4. Paste the full URL here, or copy the part between /projects/ and /edit.');
   console.log('   Example: https://script.google.com/home/projects/<scriptId>/edit');
   console.log('');
 
-  const answer = await question('Apps Script Project ID (scriptId): ');
+  const answer = await question('Apps Script URL or Project ID: ');
   rl.close();
   return answer;
 }
 
 async function main() {
   const argScriptId = process.argv[2];
-  const scriptId = isValidScriptId(argScriptId) ? argScriptId : await promptScriptId();
+  const rawValue = isValidScriptId(argScriptId) ? argScriptId : await promptScriptId();
+  const scriptId = normalizeScriptId(rawValue);
 
   if (!isValidScriptId(scriptId)) {
-    console.error('Valid scriptId was not provided.');
+    console.error('Valid Apps Script URL or scriptId was not provided.');
     printUsage();
     process.exit(1);
   }
