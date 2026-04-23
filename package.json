@@ -1,0 +1,15 @@
+{
+  "name": "google-sheets-font-preview",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Google Sheets sidebar preview for localization text with local font drag and drop.",
+  "scripts": {
+    "login": "clasp login",
+    "push": "clasp push",
+    "pull": "clasp pull",
+    "open": "clasp open"
+  },
+  "devDependencies": {
+    "@google/clasp": "^2.5.0"
+  }
+}
