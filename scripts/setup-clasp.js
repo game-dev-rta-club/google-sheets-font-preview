@@ -80,20 +80,22 @@ async function promptScriptId() {
     });
 
   console.log('');
-  console.log('How to find your Apps Script Project ID (scriptId):');
-  console.log('1. Open your spreadsheet.');
-  console.log('2. Go to Extensions > Apps Script.');
-  console.log('3. Look at the browser URL in the Apps Script editor.');
-  console.log('4. Paste the full URL here, or copy the part between /projects/ and /edit.');
-  console.log('   Example: https://script.google.com/home/projects/<scriptId>/edit');
+  console.log('Interactive setup');
   console.log('');
-  console.log('Before you run push-clasp for the first time:');
-  console.log('5. Open https://script.google.com/home/usersettings');
-  console.log('6. Enable "Google Apps Script API".');
-  console.log('7. If you just enabled it, wait a few minutes before pushing.');
+  await question('Step 1: Open your spreadsheet, then press Enter. ');
+  await question('Step 2: Open Extensions > Apps Script, then press Enter. ');
+  console.log('');
+  console.log('Step 3: In the Apps Script editor, copy either:');
+  console.log('- the full editor URL');
+  console.log('- or the raw scriptId between /projects/ and /edit');
+  console.log('Example: https://script.google.com/home/projects/<scriptId>/edit');
+  console.log('');
+  const answer = await question('Step 4: Paste the Apps Script URL or Project ID: ');
+  console.log('');
+  console.log('Step 5: Before your first push, you need to enable Google Apps Script API.');
+  console.log('Open: https://script.google.com/home/usersettings');
   console.log('');
 
-  const answer = await question('Apps Script URL or Project ID: ');
   rl.close();
   return answer;
 }
