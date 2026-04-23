@@ -6,7 +6,7 @@
   "scripts": {
     "setup-clasp": "node scripts/setup-clasp.js",
     "login-clasp": "clasp login",
-    "push-clasp": "clasp push",
+    "push-clasp": "clasp push --force",
     "pull-clasp": "clasp pull",
     "open-clasp": "clasp open"
   },
