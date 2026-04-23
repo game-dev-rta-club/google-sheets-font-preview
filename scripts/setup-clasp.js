@@ -33,6 +33,34 @@ function runClaspLogin() {
   }
 }
 
+function openUrl(url) {
+  let command;
+  let args;
+
+  if (process.platform === 'darwin') {
+    command = 'open';
+    args = [url];
+  } else if (process.platform === 'win32') {
+    command = 'cmd';
+    args = ['/c', 'start', '', url];
+  } else {
+    command = 'xdg-open';
+    args = [url];
+  }
+
+  const result = spawnSync(command, args, {
+    cwd: repoRoot,
+    stdio: 'ignore',
+  });
+
+  if (result.status !== 0) {
+    console.log('');
+    console.log(`Could not open this URL automatically: ${url}`);
+    console.log('Please open it manually.');
+    console.log('');
+  }
+}
+
 function normalizeScriptId(value) {
   if (typeof value !== 'string') {
     return '';
@@ -79,26 +107,20 @@ async function promptScriptId() {
       rl.question(message, resolve);
     });
 
-  const waitForEnter = async (step, message) => {
-    await question(`Step ${step}: ${message} Press Enter to continue. `);
-  };
-
   console.log('');
-  console.log('Interactive setup');
+  console.log('Step 1');
+  console.log('- Open your spreadsheet.');
+  console.log('- Go to Extensions > Apps Script.');
+  console.log('- In the Apps Script editor, copy the full URL or the raw scriptId between /projects/ and /edit.');
+  console.log('- Example: https://script.google.com/home/projects/<scriptId>/edit');
   console.log('');
-  await waitForEnter(1, 'Open your spreadsheet.');
-  await waitForEnter(2, 'Open Extensions > Apps Script.');
-  await question(
-    'Step 3: In the Apps Script editor, copy the full URL or the raw scriptId between /projects/ and /edit. Example: https://script.google.com/home/projects/<scriptId>/edit\nPress Enter after you have checked this. '
-  );
-  const answer = await question('Step 4: Paste the Apps Script URL or Project ID: ');
-  await waitForEnter(5, 'Open https://script.google.com/home/usersettings and make sure Google Apps Script API is enabled.');
+  const answer = await question('Paste the Apps Script URL or Project ID, then press Enter: ');
 
   rl.close();
   return answer;
 }
 
-async function confirmAppsScriptApiEnabled() {
+async function runStepTwoLogin() {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -109,27 +131,42 @@ async function confirmAppsScriptApiEnabled() {
       rl.question(message, resolve);
     });
 
-  while (true) {
-    const answer = await question('Have you enabled "Google Apps Script API" in user settings? (y/n): ');
-    const normalized = String(answer || '').trim().toLowerCase();
+  console.log('');
+  console.log('Step 2');
+  console.log('- We will start the login setup for clasp.');
+  console.log('- When you press Enter, the browser login flow will start.');
+  console.log('- After the auth setup is complete, the next step will continue automatically.');
+  console.log('');
+  await question('Press Enter to start login setup: ');
+  rl.close();
 
-    if (normalized === 'y' || normalized === 'yes') {
-      rl.close();
-      return true;
-    }
+  console.log('');
+  console.log('Starting clasp login...');
+  console.log('');
+  runClaspLogin();
+}
 
-    if (normalized === 'n' || normalized === 'no') {
-      console.log('');
-      console.log('Please enable it here before running push-clasp:');
-      console.log('https://script.google.com/home/usersettings');
-      console.log('If you just enabled it, wait a few minutes before pushing.');
-      console.log('');
-      rl.close();
-      return false;
-    }
+async function runStepThreeAppsScriptApi() {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
 
-    console.log('Please answer with y or n.');
-  }
+  const question = (message) =>
+    new Promise((resolve) => {
+      rl.question(message, resolve);
+    });
+
+  console.log('');
+  console.log('Step 3');
+  console.log('- We will open the Apps Script user settings page.');
+  console.log('- Turn ON "Google Apps Script API".');
+  console.log('- If you just enabled it, wait a few minutes before your first push.');
+  console.log('');
+  await question('Press Enter to open the settings page: ');
+  rl.close();
+
+  openUrl('https://script.google.com/home/usersettings');
 }
 
 async function main() {
@@ -144,23 +181,14 @@ async function main() {
   }
 
   writeConfig(scriptId);
-  console.log('');
-  console.log('Starting clasp login...');
-  console.log('');
-  runClaspLogin();
-  const apiEnabled = await confirmAppsScriptApiEnabled();
+  await runStepTwoLogin();
+  await runStepThreeAppsScriptApi();
 
   console.log('');
-  console.log(`Created ${path.basename(outputPath)}.`);
-  console.log('Next steps:');
-  if (!apiEnabled) {
-    console.log('1. Open https://script.google.com/home/usersettings');
-    console.log('2. Enable "Google Apps Script API"');
-    console.log('3. Wait a few minutes if you just enabled it');
-    console.log('4. npm run push-clasp');
-  } else {
-    console.log('1. npm run push-clasp');
-  }
+  console.log('Step 4');
+  console.log('- Setup complete.');
+  console.log(`- Created ${path.basename(outputPath)}.`);
+  console.log('- Next command: npm run push-clasp');
   console.log('');
 }
 
