@@ -4,6 +4,7 @@
   "private": true,
   "description": "Google Sheets sidebar preview for localization text with local font drag and drop.",
   "scripts": {
+    "setup": "node scripts/setup-clasp.js",
     "setup-clasp": "node scripts/setup-clasp.js",
     "login-clasp": "clasp login",
     "push-clasp": "clasp push --force",

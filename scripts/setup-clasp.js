@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
+const { spawnSync } = require('child_process');
 
 const repoRoot = path.resolve(__dirname, '..');
 const templatePath = path.join(repoRoot, '.clasp.json.example');
@@ -14,6 +15,22 @@ function writeConfig(scriptId) {
   const template = readTemplate();
   const content = template.replace('REPLACE_WITH_YOUR_APPS_SCRIPT_PROJECT_ID', scriptId.trim());
   fs.writeFileSync(outputPath, content, 'utf8');
+}
+
+function runClaspLogin() {
+  const command = process.platform === 'win32' ? 'npx.cmd' : 'npx';
+  const result = spawnSync(command, ['clasp', 'login'], {
+    cwd: repoRoot,
+    stdio: 'inherit',
+  });
+
+  if (result.status !== 0) {
+    console.error('');
+    console.error('clasp login failed. You can retry it with:');
+    console.error('npm run login-clasp');
+    console.error('');
+    process.exit(result.status || 1);
+  }
 }
 
 function normalizeScriptId(value) {
@@ -127,19 +144,22 @@ async function main() {
   }
 
   writeConfig(scriptId);
+  console.log('');
+  console.log('Starting clasp login...');
+  console.log('');
+  runClaspLogin();
   const apiEnabled = await confirmAppsScriptApiEnabled();
 
   console.log('');
   console.log(`Created ${path.basename(outputPath)}.`);
   console.log('Next steps:');
-  console.log('1. npm run login-clasp');
   if (!apiEnabled) {
-    console.log('2. Open https://script.google.com/home/usersettings');
-    console.log('3. Enable "Google Apps Script API"');
-    console.log('4. Wait a few minutes if you just enabled it');
-    console.log('5. npm run push-clasp');
+    console.log('1. Open https://script.google.com/home/usersettings');
+    console.log('2. Enable "Google Apps Script API"');
+    console.log('3. Wait a few minutes if you just enabled it');
+    console.log('4. npm run push-clasp');
   } else {
-    console.log('2. npm run push-clasp');
+    console.log('1. npm run push-clasp');
   }
   console.log('');
 }
