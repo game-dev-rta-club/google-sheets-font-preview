@@ -81,6 +81,40 @@ async function promptScriptId() {
   return answer;
 }
 
+async function confirmAppsScriptApiEnabled() {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  const question = (message) =>
+    new Promise((resolve) => {
+      rl.question(message, resolve);
+    });
+
+  while (true) {
+    const answer = await question('Have you enabled "Google Apps Script API" in user settings? (y/n): ');
+    const normalized = String(answer || '').trim().toLowerCase();
+
+    if (normalized === 'y' || normalized === 'yes') {
+      rl.close();
+      return true;
+    }
+
+    if (normalized === 'n' || normalized === 'no') {
+      console.log('');
+      console.log('Please enable it here before running push-clasp:');
+      console.log('https://script.google.com/home/usersettings');
+      console.log('If you just enabled it, wait a few minutes before pushing.');
+      console.log('');
+      rl.close();
+      return false;
+    }
+
+    console.log('Please answer with y or n.');
+  }
+}
+
 async function main() {
   const argScriptId = process.argv[2];
   const rawValue = isValidScriptId(argScriptId) ? argScriptId : await promptScriptId();
@@ -93,14 +127,20 @@ async function main() {
   }
 
   writeConfig(scriptId);
+  const apiEnabled = await confirmAppsScriptApiEnabled();
 
   console.log('');
   console.log(`Created ${path.basename(outputPath)}.`);
   console.log('Next steps:');
   console.log('1. npm run login-clasp');
-  console.log('2. Open https://script.google.com/home/usersettings');
-  console.log('3. Enable "Google Apps Script API" if it is still disabled');
-  console.log('4. npm run push-clasp');
+  if (!apiEnabled) {
+    console.log('2. Open https://script.google.com/home/usersettings');
+    console.log('3. Enable "Google Apps Script API"');
+    console.log('4. Wait a few minutes if you just enabled it');
+    console.log('5. npm run push-clasp');
+  } else {
+    console.log('2. npm run push-clasp');
+  }
   console.log('');
 }
 
