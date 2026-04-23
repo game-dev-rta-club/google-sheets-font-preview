@@ -1,2 +1,2 @@
-**/**
-!src/**
+# rootDir is set to "src" in .clasp.json, so clasp already scopes pushes to src/.
+# Keep this file only as documentation and avoid excluding the actual source files.
