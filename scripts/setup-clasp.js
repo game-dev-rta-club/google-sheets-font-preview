@@ -24,6 +24,8 @@ function printUsage() {
   console.log('');
   console.log('Usage: npm run setup-clasp -- <scriptId>');
   console.log('Or run without arguments to enter the scriptId interactively.');
+  console.log('You can find the scriptId in the Apps Script editor URL:');
+  console.log('https://script.google.com/home/projects/<scriptId>/edit');
   console.log('');
 }
 
@@ -37,6 +39,15 @@ async function promptScriptId() {
     new Promise((resolve) => {
       rl.question(message, resolve);
     });
+
+  console.log('');
+  console.log('How to find your Apps Script Project ID (scriptId):');
+  console.log('1. Open your spreadsheet.');
+  console.log('2. Go to Extensions > Apps Script.');
+  console.log('3. Look at the browser URL in the Apps Script editor.');
+  console.log('4. Copy the part between /projects/ and /edit.');
+  console.log('   Example: https://script.google.com/home/projects/<scriptId>/edit');
+  console.log('');
 
   const answer = await question('Apps Script Project ID (scriptId): ');
   rl.close();
