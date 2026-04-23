@@ -46,6 +46,9 @@ function printUsage() {
   console.log('You can paste the Apps Script editor URL directly:');
   console.log('https://script.google.com/home/projects/<scriptId>/edit');
   console.log('');
+  console.log('Before your first push, make sure the Apps Script API is enabled:');
+  console.log('https://script.google.com/home/usersettings');
+  console.log('');
 }
 
 async function promptScriptId() {
@@ -66,6 +69,11 @@ async function promptScriptId() {
   console.log('3. Look at the browser URL in the Apps Script editor.');
   console.log('4. Paste the full URL here, or copy the part between /projects/ and /edit.');
   console.log('   Example: https://script.google.com/home/projects/<scriptId>/edit');
+  console.log('');
+  console.log('Before you run push-clasp for the first time:');
+  console.log('5. Open https://script.google.com/home/usersettings');
+  console.log('6. Enable "Google Apps Script API".');
+  console.log('7. If you just enabled it, wait a few minutes before pushing.');
   console.log('');
 
   const answer = await question('Apps Script URL or Project ID: ');
@@ -90,7 +98,9 @@ async function main() {
   console.log(`Created ${path.basename(outputPath)}.`);
   console.log('Next steps:');
   console.log('1. npm run login-clasp');
-  console.log('2. npm run push-clasp');
+  console.log('2. Open https://script.google.com/home/usersettings');
+  console.log('3. Enable "Google Apps Script API" if it is still disabled');
+  console.log('4. npm run push-clasp');
   console.log('');
 }
 
