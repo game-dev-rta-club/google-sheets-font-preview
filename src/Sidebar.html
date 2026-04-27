@@ -11,6 +11,7 @@
         --subtle: #736b61;
         --accent: #2b6f5e;
         --accent-soft: #e2f0eb;
+        --screen-bg: #e4e1db;
       }
 
       * {
@@ -27,41 +28,189 @@
       }
 
       body {
-        padding: 14px;
+        padding: 2px;
       }
 
       .stack {
         display: grid;
-        gap: 12px;
+        gap: 8px;
       }
 
       .card {
         background: var(--panel);
         border: 1px solid var(--line);
-        border-radius: 12px;
-        padding: 12px;
+        border-radius: 0;
+        padding: 8px 6px;
       }
 
-      .title {
-        font-size: 13px;
-        font-weight: 700;
-        margin: 0 0 8px;
-      }
-
-      .meta {
-        display: grid;
-        gap: 4px;
+      .section-title {
+        margin: 0 0 4px;
         font-size: 12px;
+        font-weight: 600;
         color: var(--subtle);
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+      }
+
+      .toolbar {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+        margin-bottom: 4px;
+      }
+
+      .left-toolbar,
+      .right-toolbar {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: nowrap;
+        min-width: 0;
+      }
+
+      .select-wrap {
+        position: relative;
+        display: inline-block;
+      }
+
+      .select-wrap::after {
+        content: "▼";
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 10px;
+        color: var(--accent);
+        pointer-events: none;
+      }
+
+      select,
+      button,
+      textarea {
+        appearance: none;
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--text);
+        border-radius: 0;
+        font-size: 14px;
+      }
+
+      select,
+      button {
+        padding: 8px 10px;
+      }
+
+      select {
+        min-width: 72px;
+        max-width: 110px;
+        padding-right: 30px;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      button:disabled,
+      textarea:disabled,
+      .dropzone.disabled {
+        cursor: default;
+        opacity: 0.6;
+      }
+
+      .preview-screen {
+        border: 1px solid var(--line);
+        border-radius: 0;
+        height: 135px;
+        background: var(--screen-bg);
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .preview-screen img {
+        height: 100%;
+        width: auto;
+        max-width: 100%;
+        object-fit: contain;
+        display: block;
+        background: transparent;
+      }
+
+      .preview-empty {
+        color: #7c766e;
+        text-align: center;
+        padding: 24px;
+        line-height: 1.6;
+        font-size: 14px;
+      }
+
+      .text-preview {
+        width: 100%;
+        height: 100%;
+        min-height: 0;
+        padding: 0;
+        box-sizing: border-box;
+        resize: none;
+        border: 0;
+        background: #fff;
+        line-height: 1.0;
+        font-size: 20px;
+        font-family: inherit;
+        overflow-x: hidden;
+        overflow-y: scroll;
+        scrollbar-gutter: stable;
+        scrollbar-color: #ada69c #ece7df;
+        scrollbar-width: auto;
+      }
+
+      .text-preview::-webkit-scrollbar {
+        width: 12px;
+      }
+
+      .text-preview::-webkit-scrollbar-track {
+        background: #ece7df;
+      }
+
+      .text-preview::-webkit-scrollbar-thumb {
+        background: #ada69c;
+        border: 2px solid #ece7df;
+      }
+
+      .text-frame-outer {
+        width: 100%;
+        height: 128px;
+        padding: 0;
+        background: var(--screen-bg);
+        overflow: hidden;
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-start;
+      }
+
+      .text-frame-inner {
+        margin: 0 auto;
+        background: #fff;
+        border: 1px solid var(--line);
+        overflow: hidden;
+      }
+
+      .text-preview::placeholder {
+        color: #bbb4aa;
       }
 
       .dropzone {
-        border: 2px dashed var(--line);
-        border-radius: 12px;
+        border: 1px solid var(--line);
         background: #fff;
-        padding: 16px 12px;
+        padding: 7px 8px;
         text-align: center;
+        min-width: 118px;
+        max-width: 140px;
+        cursor: pointer;
         transition: border-color 120ms ease, background 120ms ease;
+        flex-shrink: 1;
       }
 
       .dropzone.dragover {
@@ -71,57 +220,34 @@
 
       .dropzone strong {
         display: block;
-        margin-bottom: 4px;
-        font-size: 13px;
+        font-size: clamp(9px, 2.4vw, 11px);
+        font-weight: 400;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       .dropzone p {
-        margin: 0;
-        font-size: 12px;
+        margin: 4px 0 0;
+        font-size: 9px;
         color: var(--subtle);
-        line-height: 1.5;
+        line-height: 1.4;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
-      .hidden-input {
-        display: none;
-      }
-
-      .button-row {
-        display: flex;
-        gap: 8px;
-        margin-top: 10px;
-      }
-
-      button {
-        appearance: none;
-        border: 1px solid var(--line);
-        background: #fff;
-        color: var(--text);
-        border-radius: 999px;
-        padding: 7px 12px;
-        font-size: 12px;
-        cursor: pointer;
-      }
-
-      button.primary {
-        border-color: var(--accent);
-        background: var(--accent);
-        color: #fff;
-      }
-
-      .preview {
-        background: #fff;
-        border: 1px solid var(--line);
-        border-radius: 12px;
-        min-height: 180px;
-        padding: 16px;
-        white-space: pre-wrap;
-        word-break: break-word;
-        line-height: 1.6;
-        font-size: 26px;
+      .font-hint {
+        font-size: 10px;
+        color: var(--subtle);
+        margin-top: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       .status {
+        min-height: 18px;
         font-size: 12px;
         color: var(--subtle);
       }
@@ -130,151 +256,126 @@
         color: #a6382f;
       }
 
-      .font-name {
+      .hidden-input {
+        display: none;
+      }
+
+      .control-panel {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .control-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .control-group-column {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+
+      .control-label {
         font-size: 12px;
         color: var(--subtle);
-        margin-top: 8px;
+        line-height: 1;
+      }
+
+      .selection-group {
+        gap: 0;
+        border: 1px solid var(--line);
+        background: #fff;
+      }
+
+      .selection-chip {
+        display: inline-flex;
+        align-items: center;
+        min-width: 56px;
+        padding: 8px 10px;
+        border: 0;
+        background: transparent;
+        color: var(--text);
+        font-size: 14px;
+        line-height: 1;
+      }
+
+      .selection-action {
+        border: 0;
+        border-left: 1px solid var(--line);
+        background: transparent;
+      }
+
+      .nav-button {
+        min-width: 44px;
+        font-size: 18px;
+        line-height: 1;
       }
     </style>
   </head>
   <body>
     <div class="stack">
       <section class="card">
-        <h1 class="title">Selected Cell</h1>
-        <div id="meta" class="meta">
-          <div>Loading...</div>
+        <div class="section-title">Screenshot</div>
+        <div id="imagePreview" class="preview-screen">
+          <div class="preview-empty">No Image</div>
         </div>
       </section>
 
-      <section class="card">
-        <h2 class="title">Font Preview</h2>
-        <div id="dropzone" class="dropzone" tabindex="0" role="button">
-          <strong>Drop a font here</strong>
-          <p>Supports .ttf / .otf / .woff / .woff2</p>
-          <p>The file stays in this sidebar only and is not uploaded.</p>
-        </div>
-        <input
-          id="fontInput"
-          class="hidden-input"
-          type="file"
-          accept=".ttf,.otf,.woff,.woff2,font/ttf,font/otf,font/woff,font/woff2"
-        />
-        <div class="button-row">
-          <button id="pickButton" class="primary" type="button">Choose Font</button>
-          <button id="clearButton" type="button">Clear Font</button>
-        </div>
-        <div id="fontName" class="font-name">Using browser default font.</div>
-      </section>
+      <div id="textSections" class="stack"></div>
 
       <section class="card">
-        <h2 class="title">Preview</h2>
-        <div id="preview" class="preview">Loading...</div>
+        <div class="control-panel">
+          <div class="control-group-column">
+            <div class="control-label">Preview Cell</div>
+            <div class="control-group selection-group">
+              <div id="selectionChip" class="selection-chip">ー</div>
+              <button id="selectButton" class="selection-action" type="button">Select</button>
+            </div>
+          </div>
+          <div class="control-group">
+            <button id="moveUpButton" class="nav-button" type="button">▲</button>
+            <button id="moveDownButton" class="nav-button" type="button">▼</button>
+          </div>
+        </div>
       </section>
 
       <div id="status" class="status"></div>
     </div>
 
     <script>
-      const previewEl = document.getElementById('preview');
-      const metaEl = document.getElementById('meta');
       const statusEl = document.getElementById('status');
-      const dropzoneEl = document.getElementById('dropzone');
-      const fontInputEl = document.getElementById('fontInput');
-      const pickButtonEl = document.getElementById('pickButton');
-      const clearButtonEl = document.getElementById('clearButton');
-      const fontNameEl = document.getElementById('fontName');
+      const imagePreviewEl = document.getElementById('imagePreview');
+      const textSectionsEl = document.getElementById('textSections');
+      const selectionChipEl = document.getElementById('selectionChip');
+      const selectButtonEl = document.getElementById('selectButton');
+      const moveUpButtonEl = document.getElementById('moveUpButton');
+      const moveDownButtonEl = document.getElementById('moveDownButton');
 
-      let pollingTimer = null;
-      let currentFontFamily = '';
-      let currentFontObject = null;
-      let lastSignature = '';
+      const pollIntervalMs = 200;
+      const saveDebounceMs = 350;
+
+      let nextRequestId = 0;
+      let latestAcceptedRequestId = 0;
+      let latestServerResponse = null;
+      let lastServerSignature = '';
+      let actualSelection = null;
+      let internalSelection = null;
+      let rowCache = {};
+      let fontAssignments = {};
+      let slotStates = [];
+      let slotViews = [];
+      let selectionCommitInFlight = false;
+      let ignorePollResponsesThroughRequestId = 0;
+      let scrollbarWidthPx = null;
 
       function setStatus(message, isError) {
         statusEl.textContent = message || '';
         statusEl.className = isError ? 'status error' : 'status';
-      }
-
-      function renderSelection(data) {
-        metaEl.innerHTML = '';
-
-        const metaLines = [
-          `${data.spreadsheetName}`,
-          `${data.sheetName} / ${data.a1Notation}`,
-          `Row ${data.row}, Column ${data.column}`,
-        ];
-
-        metaLines.forEach((line) => {
-          const div = document.createElement('div');
-          div.textContent = line;
-          metaEl.appendChild(div);
-        });
-
-        previewEl.textContent = data.text || '';
-      }
-
-      function refreshSelection() {
-        google.script.run
-          .withSuccessHandler((response) => {
-            if (!response || !response.ok) {
-              setStatus(response && response.message ? response.message : 'Failed to load selected cell.', true);
-              return;
-            }
-
-            const nextSignature = [
-              response.sheetName,
-              response.a1Notation,
-              response.text,
-            ].join('::');
-
-            if (nextSignature !== lastSignature) {
-              renderSelection(response);
-              lastSignature = nextSignature;
-            }
-
-            setStatus('');
-          })
-          .withFailureHandler((error) => {
-            setStatus(error && error.message ? error.message : 'Failed to load selected cell.', true);
-          })
-          .getPreviewState();
-      }
-
-      async function loadFontFile(file) {
-        if (!file) {
-          return;
-        }
-
-        try {
-          const family = `LocalPreviewFont_${Date.now()}`;
-          const buffer = await file.arrayBuffer();
-          const fontFace = new FontFace(family, buffer);
-          await fontFace.load();
-          document.fonts.add(fontFace);
-
-          if (currentFontObject) {
-            document.fonts.delete(currentFontObject);
-          }
-
-          currentFontFamily = family;
-          currentFontObject = fontFace;
-          previewEl.style.fontFamily = `"${family}"`;
-          fontNameEl.textContent = `Loaded: ${file.name}`;
-          setStatus('');
-        } catch (error) {
-          setStatus(`Font load failed: ${error && error.message ? error.message : error}`, true);
-        }
-      }
-
-      function clearFont() {
-        if (currentFontObject) {
-          document.fonts.delete(currentFontObject);
-        }
-
-        currentFontFamily = '';
-        currentFontObject = null;
-        previewEl.style.fontFamily = '';
-        fontNameEl.textContent = 'Using browser default font.';
-        setStatus('');
       }
 
       function preventDefaults(event) {
@@ -282,51 +383,913 @@
         event.stopPropagation();
       }
 
-      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach((eventName) => {
-        dropzoneEl.addEventListener(eventName, preventDefaults);
-      });
-
-      ['dragenter', 'dragover'].forEach((eventName) => {
-        dropzoneEl.addEventListener(eventName, () => {
-          dropzoneEl.classList.add('dragover');
-        });
-      });
-
-      ['dragleave', 'drop'].forEach((eventName) => {
-        dropzoneEl.addEventListener(eventName, () => {
-          dropzoneEl.classList.remove('dragover');
-        });
-      });
-
-      dropzoneEl.addEventListener('drop', (event) => {
-        const files = event.dataTransfer && event.dataTransfer.files;
-        if (files && files.length > 0) {
-          loadFontFile(files[0]);
+      function getConfig(response) {
+        if (response && response.config) {
+          return response.config;
         }
-      });
 
-      dropzoneEl.addEventListener('click', () => {
-        fontInputEl.click();
-      });
+        throw new Error('Missing preview config.');
+      }
 
-      pickButtonEl.addEventListener('click', () => {
-        fontInputEl.click();
-      });
+      function normalizeLabel(value) {
+        return String(value || '').trim().toLowerCase();
+      }
 
-      clearButtonEl.addEventListener('click', () => {
-        clearFont();
-      });
+      function buildServerSignature(response) {
+        const rowWindowSignature = (response.rowWindow || []).map((rowState) => {
+          const columnSignature = (rowState.columns || []).map((column) => {
+            return [column.key, column.text, column.imageUrl, column.formula].join('|');
+          }).join('||');
+          return `${rowState.row}:${columnSignature}`;
+        }).join('###');
 
-      fontInputEl.addEventListener('change', (event) => {
-        const files = event.target.files;
-        if (files && files.length > 0) {
-          loadFontFile(files[0]);
+        return [
+          response.sheetName,
+          response.row,
+          response.column,
+          response.selectedHeaderKey,
+          rowWindowSignature,
+        ].join('@@');
+      }
+
+      function selectionFromResponse(response) {
+        if (!response) {
+          return null;
         }
+
+        return {
+          sheetName: response.sheetName,
+          row: response.row,
+          column: response.column,
+          a1Notation: response.a1Notation,
+          headerKey: response.selectedHeaderKey,
+        };
+      }
+
+      function selectionFingerprint(selection) {
+        if (!selection) {
+          return '';
+        }
+
+        return [
+          selection.sheetName,
+          selection.row,
+          selection.column,
+          selection.a1Notation,
+          selection.headerKey,
+        ].join('|');
+      }
+
+      function formatSelectionChip(selection) {
+        if (!selection) {
+          return 'ー';
+        }
+
+        const a1 = String(selection.a1Notation || '').trim();
+        if (!a1) {
+          return 'ー';
+        }
+
+        const match = a1.match(/^([A-Z]+)(\d+)$/i);
+        if (!match) {
+          return a1;
+        }
+
+        return `${match[1].toUpperCase()}-${match[2]}`;
+      }
+
+      function columnToA1Letters(column) {
+        let value = Math.max(1, Number(column) || 1);
+        let result = '';
+
+        while (value > 0) {
+          const remainder = (value - 1) % 26;
+          result = String.fromCharCode(65 + remainder) + result;
+          value = Math.floor((value - 1) / 26);
+        }
+
+        return result;
+      }
+
+      function buildA1Notation(row, column) {
+        return `${columnToA1Letters(column)}${Math.max(1, Number(row) || 1)}`;
+      }
+
+      function cacheKey(sheetName, row) {
+        return `${sheetName}::${row}`;
+      }
+
+      function mergeRowCache(response) {
+        if (!response || !response.rowWindow) {
+          return;
+        }
+
+        if (response.sheetName && response.row && response.columns) {
+          rowCache[cacheKey(response.sheetName, response.row)] = {
+            row: response.row,
+            columns: response.columns,
+          };
+        }
+
+        response.rowWindow.forEach((rowState) => {
+          rowCache[cacheKey(response.sheetName, rowState.row)] = rowState;
+        });
+
+        pruneRowCache(response);
+      }
+
+      function pruneRowCache(response) {
+        const keepKeys = new Set();
+        const addRow = (sheetName, row) => {
+          if (!sheetName || !row) {
+            return;
+          }
+
+          keepKeys.add(cacheKey(sheetName, row));
+        };
+
+        if (response) {
+          addRow(response.sheetName, response.row);
+          (response.rowWindow || []).forEach((rowState) => addRow(response.sheetName, rowState.row));
+        }
+
+        addRow(actualSelection && actualSelection.sheetName, actualSelection && actualSelection.row);
+        addRow(internalSelection && internalSelection.sheetName, internalSelection && internalSelection.row);
+
+        slotStates.forEach((slotState) => {
+          const target = slotState && (slotState.editLockTarget || slotState.target);
+          addRow(target && target.sheetName, target && target.row);
+        });
+
+        Object.keys(rowCache).forEach((key) => {
+          if (!keepKeys.has(key)) {
+            delete rowCache[key];
+          }
+        });
+      }
+
+      function getCachedRow(sheetName, row) {
+        return rowCache[cacheKey(sheetName, row)] || null;
+      }
+
+      function getFontStateForKey(columnKey) {
+        return columnKey && fontAssignments[columnKey] ? fontAssignments[columnKey] : null;
+      }
+
+      function getDisplayedColumns() {
+        if (!internalSelection) {
+          return [];
+        }
+
+        const cached = getCachedRow(internalSelection.sheetName, internalSelection.row);
+        if (cached) {
+          return cached.columns || [];
+        }
+
+        if (
+          latestServerResponse
+          && latestServerResponse.sheetName === internalSelection.sheetName
+          && latestServerResponse.row === internalSelection.row
+        ) {
+          return latestServerResponse.columns || [];
+        }
+
+        return [];
+      }
+
+      function findColumnByKey(columns, key) {
+        return (columns || []).find((column) => column.key === key) || null;
+      }
+
+      function findColumnByNormalizedLabel(columns, normalizedLabel) {
+        return (columns || []).find((column) => normalizeLabel(column.label) === normalizedLabel) || null;
+      }
+
+      function isFrozenLocalizationColumn(columns, headerKey, config) {
+        const column = findColumnByKey(columns, headerKey);
+        if (!column) {
+          return false;
+        }
+
+        const normalizedLabel = normalizeLabel(column.label);
+        return normalizedLabel === normalizeLabel(config.imageHeaderName)
+          || normalizedLabel === normalizeLabel(config.widthHeaderName)
+          || normalizedLabel === normalizeLabel(config.heightHeaderName);
+      }
+
+      function getPreviousLocalizationColumn(columns, config) {
+        const previousState = slotStates[1];
+        const previousTarget = previousState && (previousState.editLockTarget || previousState.target);
+        if (!previousTarget) {
+          return null;
+        }
+
+        const previousColumn = findColumnByKey(columns, previousTarget.headerKey);
+        if (!previousColumn || isFrozenLocalizationColumn(columns, previousColumn.key, config)) {
+          return null;
+        }
+
+        return previousColumn;
+      }
+
+      function getSelectableLocalizationColumns(columns, config) {
+        return (columns || []).filter((column) => !isFrozenLocalizationColumn(columns, column.key, config));
+      }
+
+      function getDefaultLocalizationColumn(columns, config) {
+        return getPreviousLocalizationColumn(columns, config) || null;
+      }
+
+      function parsePositiveNumber(value) {
+        const parsed = Number(String(value || '').trim());
+        return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+      }
+
+      function getScrollbarWidthPx() {
+        if (scrollbarWidthPx !== null) {
+          return scrollbarWidthPx;
+        }
+
+        const probe = document.createElement('div');
+        probe.style.width = '100px';
+        probe.style.height = '100px';
+        probe.style.position = 'absolute';
+        probe.style.top = '-9999px';
+        probe.style.overflowY = 'scroll';
+        document.body.appendChild(probe);
+        scrollbarWidthPx = probe.offsetWidth - probe.clientWidth;
+        document.body.removeChild(probe);
+        return scrollbarWidthPx;
+      }
+
+      function createTextFrameMetrics(widthUnits, heightUnits) {
+        return {
+          widthUnits,
+          heightUnits,
+        };
+      }
+
+      function getDefaultTextFrameMetrics() {
+        return createTextFrameMetrics(20.25, 4.25);
+      }
+
+      function getTextFrameMetrics(columns, config) {
+        const widthColumn = findColumnByNormalizedLabel(columns, normalizeLabel(config.widthHeaderName));
+        const heightColumn = findColumnByNormalizedLabel(columns, normalizeLabel(config.heightHeaderName));
+        const widthUnits = (parsePositiveNumber(widthColumn ? widthColumn.text : '') || 20) + 0.25;
+        const heightUnits = (parsePositiveNumber(heightColumn ? heightColumn.text : '') || 4) + 0.25;
+        return createTextFrameMetrics(widthUnits, heightUnits);
+      }
+
+      function calculateTextLayoutMetrics(frameOuter, frameMetrics) {
+        const outerUsableWidth = Math.max(20, frameOuter.clientWidth);
+        const outerUsableHeight = Math.max(16, frameOuter.clientHeight);
+        const reservedScrollbarWidth = getScrollbarWidthPx();
+        const fontSize = Math.max(8, Math.min(
+          (outerUsableWidth - reservedScrollbarWidth) / Math.max(frameMetrics.widthUnits, 1),
+          outerUsableHeight / Math.max(frameMetrics.heightUnits, 1)
+        ));
+
+        return {
+          fontSize,
+          innerWidth: (frameMetrics.widthUnits * fontSize) + reservedScrollbarWidth,
+          innerHeight: frameMetrics.heightUnits * fontSize,
+        };
+      }
+
+      function applyTextLayoutMetrics(view, layoutMetrics) {
+        view.frameInner.style.width = `${layoutMetrics.innerWidth}px`;
+        view.frameInner.style.height = `${layoutMetrics.innerHeight}px`;
+        view.preview.style.fontSize = `${layoutMetrics.fontSize}px`;
+      }
+
+      function applyTextSizing(view, frameMetrics) {
+        applyTextLayoutMetrics(view, calculateTextLayoutMetrics(view.frameOuter, frameMetrics));
+      }
+
+      function ensureSlotStates(columns, config) {
+        const baseColumn = findColumnByNormalizedLabel(columns, normalizeLabel(config.baseLanguageHeaderName));
+        const selectedLocalizationColumn = findColumnByKey(columns, internalSelection ? internalSelection.headerKey : '');
+        const localizationColumn = selectedLocalizationColumn && !isFrozenLocalizationColumn(columns, selectedLocalizationColumn.key, config)
+          ? selectedLocalizationColumn
+          : getDefaultLocalizationColumn(columns, config);
+        const localizationEditable = Boolean(
+          localizationColumn
+          && normalizeLabel(localizationColumn.label) !== normalizeLabel(config.baseLanguageHeaderName)
+        );
+
+        const nextStates = [];
+        for (let i = 0; i < 2; i++) {
+          const existing = slotStates[i] || {};
+          let targetColumn = null;
+          let editable = false;
+
+          if (i === 0) {
+            targetColumn = baseColumn;
+            editable = false;
+          } else {
+            targetColumn = localizationColumn;
+            editable = Boolean(localizationEditable);
+          }
+
+          const target = targetColumn && internalSelection
+            ? {
+                sheetName: internalSelection.sheetName,
+                row: internalSelection.row,
+                column: targetColumn.columnIndex,
+                a1Notation: targetColumn.a1Notation,
+                headerKey: targetColumn.key,
+                fingerprint: `${internalSelection.sheetName}|${targetColumn.a1Notation}|${targetColumn.key}`,
+              }
+            : null;
+
+          const shouldKeepDraft = existing.targetFingerprint && target && existing.targetFingerprint === target.fingerprint;
+          nextStates.push({
+            target: target,
+            targetFingerprint: target ? target.fingerprint : '',
+            editable: editable,
+            label: targetColumn ? targetColumn.label : 'ー',
+            draftValue: shouldKeepDraft ? (existing.draftValue || '') : '',
+            isDirty: shouldKeepDraft ? Boolean(existing.isDirty) : false,
+            debounceTimer: existing.debounceTimer || null,
+            saveToken: existing.saveToken || 0,
+            editLockTarget: existing.editLockTarget || null,
+            editLockFingerprint: existing.editLockFingerprint || '',
+          });
+        }
+
+        slotStates = nextStates;
+      }
+
+      function getSlotDisplayValue(slotState, targetColumn) {
+        const effectiveTarget = slotState.editLockTarget || slotState.target;
+        const isHeaderRowTarget = Boolean(effectiveTarget && effectiveTarget.row === 1);
+        if (slotState.isDirty) {
+          return slotState.draftValue;
+        }
+
+        if (isHeaderRowTarget) {
+          return '';
+        }
+
+        return targetColumn ? (targetColumn.text || '') : '';
+      }
+
+      function renderImageSection(columns, config) {
+        const imageColumn = findColumnByNormalizedLabel(columns, normalizeLabel(config.imageHeaderName));
+        imagePreviewEl.innerHTML = '';
+
+        if (imageColumn && imageColumn.imageUrl) {
+          const img = document.createElement('img');
+          img.src = imageColumn.imageUrl;
+          img.alt = imageColumn.label;
+          imagePreviewEl.appendChild(img);
+          return;
+        }
+
+        const empty = document.createElement('div');
+        empty.className = 'preview-empty';
+        empty.textContent = 'No Image';
+        imagePreviewEl.appendChild(empty);
+      }
+
+      function queueTextSave(slotIndex) {
+        const slotState = slotStates[slotIndex];
+        const effectiveTarget = slotState && (slotState.editLockTarget || slotState.target);
+        if (!slotState || !effectiveTarget || !slotState.editable) {
+          return;
+        }
+
+        if (slotState.debounceTimer) {
+          clearTimeout(slotState.debounceTimer);
+        }
+
+        const target = { ...effectiveTarget };
+        const draftValue = slotState.draftValue;
+        const token = ++slotState.saveToken;
+
+        slotState.debounceTimer = window.setTimeout(() => {
+          google.script.run
+            .withSuccessHandler((result) => {
+              const currentSlotState = slotStates[slotIndex];
+              if (!currentSlotState || currentSlotState.saveToken !== token) {
+                return;
+              }
+
+              if (!result || result.ok === false) {
+                setStatus(result && result.message ? result.message : 'Failed to save text.', true);
+                return;
+              }
+
+              const cached = getCachedRow(target.sheetName, target.row);
+              if (cached) {
+                const targetColumn = findColumnByKey(cached.columns, target.headerKey);
+                if (targetColumn) {
+                  targetColumn.text = draftValue;
+                  targetColumn.hasText = String(draftValue).trim() !== '';
+                }
+              }
+
+              currentSlotState.isDirty = false;
+              currentSlotState.draftValue = draftValue;
+              setStatus('');
+            })
+            .withFailureHandler((error) => {
+              const currentSlotState = slotStates[slotIndex];
+              if (!currentSlotState || currentSlotState.saveToken !== token) {
+                return;
+              }
+
+              setStatus(error && error.message ? error.message : 'Failed to save text.', true);
+            })
+            .updateCellText({
+              sheetName: target.sheetName,
+              row: target.row,
+              column: target.column,
+              a1Notation: target.a1Notation,
+              headerKey: target.headerKey,
+              value: draftValue,
+          });
+        }, saveDebounceMs);
+      }
+
+      function createSlotView(slotIndex) {
+        const card = document.createElement('section');
+        card.className = 'card';
+
+        const title = document.createElement('div');
+        title.className = 'section-title';
+        title.textContent = slotIndex === 0 ? 'Base Language' : 'Localization';
+        card.appendChild(title);
+
+        const toolbar = document.createElement('div');
+        toolbar.className = 'toolbar';
+
+        const left = document.createElement('div');
+        left.className = 'left-toolbar';
+
+        const fixedLabel = document.createElement('button');
+        fixedLabel.type = 'button';
+        fixedLabel.disabled = true;
+        left.appendChild(fixedLabel);
+
+        let localizationSelectWrap = null;
+        let localizationSelect = null;
+        if (slotIndex === 1) {
+          localizationSelectWrap = document.createElement('div');
+          localizationSelectWrap.className = 'select-wrap';
+          localizationSelect = document.createElement('select');
+          localizationSelect.dataset.slotIndex = String(slotIndex);
+          localizationSelectWrap.appendChild(localizationSelect);
+          left.appendChild(localizationSelectWrap);
+          fixedLabel.style.display = 'none';
+
+          localizationSelect.addEventListener('change', (event) => {
+            const nextKey = event.target.value;
+            if (!internalSelection || !nextKey) {
+              return;
+            }
+
+            const displayedColumns = getDisplayedColumns();
+            const nextColumn = findColumnByKey(displayedColumns, nextKey);
+            if (!nextColumn) {
+              return;
+            }
+
+            internalSelection = {
+              ...internalSelection,
+              column: nextColumn.columnIndex,
+              headerKey: nextColumn.key,
+              a1Notation: buildA1Notation(internalSelection.row, nextColumn.columnIndex),
+            };
+            renderCurrentView();
+          });
+        }
+
+        const right = document.createElement('div');
+        right.className = 'right-toolbar';
+
+        const dropzone = document.createElement('div');
+        dropzone.className = 'dropzone disabled';
+        dropzone.dataset.slotIndex = String(slotIndex);
+        dropzone.innerHTML = '<strong>Set Font</strong><p>.ttf / .otf / .woff / .woff2</p>';
+        dropzone.tabIndex = -1;
+
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '.ttf,.otf,.woff,.woff2,font/ttf,font/otf,font/woff,font/woff2';
+        fileInput.className = 'hidden-input';
+        fileInput.dataset.slotIndex = String(slotIndex);
+        fileInput.disabled = true;
+
+        right.appendChild(dropzone);
+        right.appendChild(fileInput);
+        toolbar.appendChild(left);
+        toolbar.appendChild(right);
+        card.appendChild(toolbar);
+
+        const frameOuter = document.createElement('div');
+        frameOuter.className = 'text-frame-outer';
+
+        const frameInner = document.createElement('div');
+        frameInner.className = 'text-frame-inner';
+
+        const preview = document.createElement('textarea');
+        preview.className = 'text-preview';
+        preview.placeholder = 'text';
+        preview.dataset.slotIndex = String(slotIndex);
+        frameInner.appendChild(preview);
+        frameOuter.appendChild(frameInner);
+        card.appendChild(frameOuter);
+
+        const hint = document.createElement('div');
+        hint.className = 'font-hint';
+        hint.style.display = 'none';
+        card.appendChild(hint);
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach((eventName) => {
+          dropzone.addEventListener(eventName, preventDefaults);
+        });
+
+        ['dragenter', 'dragover'].forEach((eventName) => {
+          dropzone.addEventListener(eventName, () => {
+            const slotState = slotStates[slotIndex];
+            if (slotState && slotState.editable) {
+              dropzone.classList.add('dragover');
+            }
+          });
+        });
+
+        ['dragleave', 'drop'].forEach((eventName) => {
+          dropzone.addEventListener(eventName, () => {
+            dropzone.classList.remove('dragover');
+          });
+        });
+
+        dropzone.addEventListener('drop', (event) => {
+          const slotState = slotStates[slotIndex];
+          if (!slotState || !slotState.editable) {
+            return;
+          }
+
+          const files = event.dataTransfer && event.dataTransfer.files;
+          if (files && files.length > 0) {
+            loadFontFileForSlot(slotIndex, files[0]);
+          }
+        });
+
+        dropzone.addEventListener('click', () => {
+          const slotState = slotStates[slotIndex];
+          if (!slotState || !slotState.editable) {
+            return;
+          }
+          fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (event) => {
+          const slotState = slotStates[slotIndex];
+          if (!slotState || !slotState.editable) {
+            return;
+          }
+
+          const files = event.target.files;
+          if (files && files.length > 0) {
+            loadFontFileForSlot(slotIndex, files[0]);
+          }
+          event.target.value = '';
+        });
+
+        preview.addEventListener('focus', () => {
+          const slotState = slotStates[slotIndex];
+          if (!slotState) {
+            return;
+          }
+          slotState.editLockTarget = slotState.target ? { ...slotState.target } : null;
+          slotState.editLockFingerprint = slotState.targetFingerprint || '';
+        });
+
+        preview.addEventListener('blur', () => {
+          const slotState = slotStates[slotIndex];
+          if (!slotState) {
+            return;
+          }
+          slotState.editLockTarget = null;
+          slotState.editLockFingerprint = '';
+          window.setTimeout(renderCurrentView, 0);
+        });
+
+        preview.addEventListener('input', (event) => {
+          const index = Number(event.target.dataset.slotIndex);
+          const currentSlotState = slotStates[index];
+          const effectiveTarget = currentSlotState && (currentSlotState.editLockTarget || currentSlotState.target);
+          if (!currentSlotState || !effectiveTarget || !currentSlotState.editable) {
+            return;
+          }
+
+          currentSlotState.draftValue = event.target.value;
+          currentSlotState.isDirty = true;
+          queueTextSave(index);
+        });
+
+        textSectionsEl.appendChild(card);
+
+        return { card, fixedLabel, localizationSelectWrap, localizationSelect, dropzone, fileInput, frameOuter, frameInner, preview, hint };
+      }
+
+      function ensureSlotViews() {
+        while (slotViews.length < 2) {
+          slotViews.push(createSlotView(slotViews.length));
+        }
+      }
+
+      function renderTextSections(columns, config) {
+        ensureSlotStates(columns, config);
+        ensureSlotViews();
+
+        slotStates.forEach((slotState, slotIndex) => {
+          const view = slotViews[slotIndex];
+          const effectiveTarget = slotState.editLockTarget || slotState.target;
+          const effectiveFingerprint = slotState.editLockFingerprint || slotState.targetFingerprint;
+          const viewColumns = effectiveTarget
+            ? ((getCachedRow(effectiveTarget.sheetName, effectiveTarget.row) || {}).columns || [])
+            : columns;
+          const targetColumn = effectiveTarget ? findColumnByKey(viewColumns, effectiveTarget.headerKey) : null;
+          const fontState = getFontStateForKey(effectiveTarget ? effectiveTarget.headerKey : '');
+          const frameMetrics = getTextFrameMetrics(viewColumns, config);
+          const nextValue = getSlotDisplayValue(slotState, targetColumn);
+          const isFocused = document.activeElement === view.preview;
+
+          if (slotIndex === 1 && view.localizationSelect) {
+            const selectableColumns = getSelectableLocalizationColumns(viewColumns, config);
+            view.localizationSelect.innerHTML = '';
+            selectableColumns.forEach((column) => {
+              const option = document.createElement('option');
+              option.value = column.key;
+              option.textContent = column.label || 'ー';
+              option.selected = Boolean(effectiveTarget && column.key === effectiveTarget.headerKey);
+              view.localizationSelect.appendChild(option);
+            });
+            view.localizationSelect.disabled = selectableColumns.length === 0;
+            if (view.localizationSelectWrap) {
+              view.localizationSelectWrap.style.display = '';
+            }
+            view.fixedLabel.style.display = 'none';
+          } else {
+            view.fixedLabel.textContent = slotState.label || 'ー';
+            view.fixedLabel.style.display = '';
+            if (view.localizationSelectWrap) {
+              view.localizationSelectWrap.style.display = 'none';
+            }
+          }
+
+          view.dropzone.className = `dropzone${slotState.editable ? '' : ' disabled'}`;
+          view.dropzone.tabIndex = slotState.editable ? 0 : -1;
+          view.fileInput.disabled = !slotState.editable;
+          view.preview.disabled = !slotState.editable;
+          view.preview.dataset.targetFingerprint = effectiveFingerprint || '';
+
+          if (fontState && fontState.fontFamily) {
+            view.preview.style.fontFamily = `"${fontState.fontFamily}"`;
+            view.hint.textContent = fontState.fontLabel;
+            view.hint.style.display = 'block';
+          } else {
+            view.preview.style.fontFamily = '';
+            view.hint.textContent = '';
+            view.hint.style.display = 'none';
+          }
+
+          if (!isFocused && view.preview.value !== nextValue) {
+            view.preview.value = nextValue;
+          }
+
+          applyTextSizing(view, frameMetrics);
+        });
+      }
+
+      function renderCurrentView() {
+        const baseResponse = latestServerResponse;
+        if (!baseResponse || !internalSelection) {
+          selectionChipEl.textContent = formatSelectionChip(internalSelection);
+          return;
+        }
+
+        selectionChipEl.textContent = formatSelectionChip(internalSelection);
+        const columns = getDisplayedColumns();
+        let config;
+        try {
+          config = getConfig(baseResponse);
+        } catch (error) {
+          setStatus(error.message || 'Missing preview config.', true);
+          return;
+        }
+        renderImageSection(columns, config);
+        renderTextSections(columns, config);
+      }
+
+      function renderInitialLayout() {
+        if (slotStates.length === 0) {
+          slotStates = [
+            { target: null, targetFingerprint: '', editable: false, label: 'ー', draftValue: '', isDirty: false, debounceTimer: null, saveToken: 0, editLockTarget: null, editLockFingerprint: '' },
+            { target: null, targetFingerprint: '', editable: false, label: 'ー', draftValue: '', isDirty: false, debounceTimer: null, saveToken: 0, editLockTarget: null, editLockFingerprint: '' },
+          ];
+        }
+
+        ensureSlotViews();
+        imagePreviewEl.innerHTML = '<div class="preview-empty">No Image</div>';
+        slotViews.forEach((view) => {
+          view.fixedLabel.textContent = 'ー';
+          if (view.localizationSelectWrap) {
+            view.localizationSelectWrap.style.display = 'none';
+          }
+          view.fixedLabel.style.display = '';
+          view.dropzone.className = 'dropzone disabled';
+          view.dropzone.tabIndex = -1;
+          view.fileInput.disabled = true;
+          view.preview.disabled = true;
+          view.preview.value = '';
+          view.preview.style.fontFamily = '';
+          view.hint.textContent = '';
+          view.hint.style.display = 'none';
+          applyTextSizing(view, getDefaultTextFrameMetrics());
+        });
+        selectionChipEl.textContent = formatSelectionChip(internalSelection);
+      }
+
+      async function loadFontFileForSlot(slotIndex, file) {
+        if (!file) {
+          return;
+        }
+
+        const slotState = slotStates[slotIndex];
+        const effectiveTarget = slotState && (slotState.editLockTarget || slotState.target);
+        const selectedKey = effectiveTarget ? effectiveTarget.headerKey : '';
+        if (!selectedKey || !slotState.editable) {
+          setStatus('This panel is not editable.', true);
+          return;
+        }
+
+        try {
+          const family = `LocalPreviewFont_${slotIndex}_${Date.now()}`;
+          const buffer = await file.arrayBuffer();
+          const fontFace = new FontFace(family, buffer);
+          await fontFace.load();
+          document.fonts.add(fontFace);
+
+          const previousFontState = getFontStateForKey(selectedKey);
+          if (previousFontState && previousFontState.fontObject) {
+            document.fonts.delete(previousFontState.fontObject);
+          }
+
+          fontAssignments[selectedKey] = {
+            fontObject: fontFace,
+            fontFamily: family,
+            fontLabel: `Loaded: ${file.name}`,
+          };
+
+          renderCurrentView();
+          setStatus('');
+        } catch (error) {
+          setStatus(`Font load failed: ${error && error.message ? error.message : error}`, true);
+        }
+      }
+
+      function refreshSelection() {
+        const requestId = ++nextRequestId;
+
+        google.script.run
+          .withSuccessHandler((response) => {
+            if (!response || !response.ok) {
+              setStatus(response && response.message ? response.message : 'Failed to load selected row.', true);
+              return;
+            }
+
+            if (requestId < latestAcceptedRequestId) {
+              return;
+            }
+
+            if (selectionCommitInFlight) {
+              return;
+            }
+
+            if (requestId <= ignorePollResponsesThroughRequestId) {
+              return;
+            }
+
+            latestAcceptedRequestId = requestId;
+            latestServerResponse = response;
+            mergeRowCache(response);
+
+            const actualNext = selectionFromResponse(response);
+            const actualChanged = selectionFingerprint(actualSelection) !== selectionFingerprint(actualNext);
+            actualSelection = actualNext;
+
+            if (actualChanged || !internalSelection) {
+              internalSelection = { ...actualSelection };
+            }
+
+            const nextSignature = buildServerSignature(response);
+            if (nextSignature !== lastServerSignature || actualChanged) {
+              lastServerSignature = nextSignature;
+              renderCurrentView();
+            }
+
+            setStatus('');
+          })
+          .withFailureHandler((error) => {
+            setStatus(error && error.message ? error.message : 'Failed to load selected row.', true);
+          })
+          .getPreviewState();
+      }
+
+      function requestInternalSelectionRow(row) {
+        if (!internalSelection) {
+          return;
+        }
+
+        const targetRow = Math.max(2, row);
+        internalSelection = {
+          ...internalSelection,
+          row: targetRow,
+          a1Notation: buildA1Notation(targetRow, internalSelection.column),
+        };
+        renderCurrentView();
+
+        google.script.run
+          .withSuccessHandler((response) => {
+            if (!response || !response.ok) {
+              setStatus(response && response.message ? response.message : 'Failed to load row preview.', true);
+              return;
+            }
+
+            latestServerResponse = response;
+            mergeRowCache(response);
+            renderCurrentView();
+            setStatus('');
+          })
+          .withFailureHandler((error) => {
+            setStatus(error && error.message ? error.message : 'Failed to load row preview.', true);
+          })
+          .getPreviewStateForPosition({
+            sheetName: internalSelection.sheetName,
+            row: targetRow,
+            column: internalSelection.column,
+          });
+      }
+
+      moveUpButtonEl.addEventListener('click', () => {
+        if (!internalSelection) {
+          return;
+        }
+        requestInternalSelectionRow(internalSelection.row - 1);
+      });
+
+      moveDownButtonEl.addEventListener('click', () => {
+        if (!internalSelection) {
+          return;
+        }
+        requestInternalSelectionRow(internalSelection.row + 1);
+      });
+
+      selectButtonEl.addEventListener('click', () => {
+        if (!internalSelection) {
+          return;
+        }
+
+        selectionCommitInFlight = true;
+        selectButtonEl.disabled = true;
+        setStatus('');
+
+        google.script.run
+          .withSuccessHandler((response) => {
+            selectionCommitInFlight = false;
+            ignorePollResponsesThroughRequestId = nextRequestId;
+            selectButtonEl.disabled = false;
+
+            if (!response || !response.ok) {
+              setStatus(response && response.message ? response.message : 'Failed to select cell.', true);
+              return;
+            }
+
+            latestServerResponse = response;
+            mergeRowCache(response);
+            actualSelection = selectionFromResponse(response);
+            internalSelection = actualSelection ? { ...actualSelection } : null;
+            lastServerSignature = buildServerSignature(response);
+            renderCurrentView();
+            setStatus('');
+          })
+          .withFailureHandler((error) => {
+            selectionCommitInFlight = false;
+            selectButtonEl.disabled = false;
+            setStatus(error && error.message ? error.message : 'Failed to select cell.', true);
+          })
+          .moveSelectionTo(internalSelection.row, internalSelection.column);
       });
 
       function startPolling() {
+        renderInitialLayout();
         refreshSelection();
-        pollingTimer = window.setInterval(refreshSelection, 250);
+        window.setInterval(refreshSelection, pollIntervalMs);
       }
 
       startPolling();
