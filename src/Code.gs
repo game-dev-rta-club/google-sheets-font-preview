@@ -1,20 +1,43 @@
-var PREVIEW_ROW_WINDOW_RADIUS = 5;
-var IMAGE_HEADER_NAME = 'image';
-var BASE_LANGUAGE_HEADER_NAME = 'jp';
-var WIDTH_HEADER_NAME = 'width';
-var HEIGHT_HEADER_NAME = 'height';
-var RESERVED_HEADER_NAMES = [IMAGE_HEADER_NAME, BASE_LANGUAGE_HEADER_NAME, WIDTH_HEADER_NAME, HEIGHT_HEADER_NAME];
+function getReservedHeaderNames_() {
+  var config = getFontPreviewConfig_();
+  return [
+    config.headers.image,
+    config.headers.baseLanguage,
+    config.headers.width,
+    config.headers.height,
+  ];
+}
+
+function createClientPreviewConfig_() {
+  var config = getFontPreviewConfig_();
+  return {
+    imageHeaderName: config.headers.image,
+    baseLanguageHeaderName: config.headers.baseLanguage,
+    widthHeaderName: config.headers.width,
+    heightHeaderName: config.headers.height,
+    reservedHeaderNames: getReservedHeaderNames_(),
+    pollIntervalMs: config.timing.pollIntervalMs,
+    saveDebounceMs: config.timing.saveDebounceMs,
+    textFrameBaseWidthUnits: config.textFrame.baseWidthUnits,
+    textFrameBaseHeightUnits: config.textFrame.baseHeightUnits,
+    textFrameSizePaddingUnits: config.textFrame.sizePaddingUnits,
+  };
+}
 
 function onOpen() {
+  var config = getFontPreviewConfig_();
   SpreadsheetApp.getUi()
-    .createMenu('Localization')
-    .addItem('Font Preview', 'showLocalizationPreviewSidebar')
+    .createMenu(config.ui.menuName)
+    .addItem(config.ui.menuItemName, 'showLocalizationPreviewSidebar')
     .addToUi();
 }
 
 function showLocalizationPreviewSidebar() {
-  var html = HtmlService.createHtmlOutputFromFile('Sidebar')
-    .setTitle('Localization Preview');
+  var config = getFontPreviewConfig_();
+  var template = HtmlService.createTemplateFromFile('Sidebar');
+  template.bootstrapConfigJson = JSON.stringify(createClientPreviewConfig_());
+  var html = template.evaluate()
+    .setTitle(config.ui.sidebarTitle);
   SpreadsheetApp.getUi().showSidebar(html);
 }
 
@@ -165,7 +188,7 @@ function createPreviewStateFromCoordinates_(spreadsheet, sheet, row, column, tri
   var headerValues = getHeaderValues_(sheet);
   var currentRowState = createRowState_(sheet, row, headerValues);
   var selectedHeaderKey = createHeaderKey_(column, headerValues[column - 1] || '');
-  var rowWindow = createRowWindow_(sheet, row, headerValues, PREVIEW_ROW_WINDOW_RADIUS);
+  var rowWindow = createRowWindow_(sheet, row, headerValues, getFontPreviewConfig_().rowWindowRadius);
 
   return {
     ok: true,
@@ -180,13 +203,7 @@ function createPreviewStateFromCoordinates_(spreadsheet, sheet, row, column, tri
     serverSavedAtIso: now.toISOString(),
     columns: currentRowState.columns,
     rowWindow: rowWindow,
-    config: {
-      imageHeaderName: IMAGE_HEADER_NAME,
-      baseLanguageHeaderName: BASE_LANGUAGE_HEADER_NAME,
-      widthHeaderName: WIDTH_HEADER_NAME,
-      heightHeaderName: HEIGHT_HEADER_NAME,
-      reservedHeaderNames: RESERVED_HEADER_NAMES.slice(),
-    },
+    config: createClientPreviewConfig_(),
   };
 }
 
