@@ -348,6 +348,8 @@
     </div>
 
     <script>
+      const BOOTSTRAP_CONFIG = Object.freeze(<?!= bootstrapConfigJson ?>);
+
       const statusEl = document.getElementById('status');
       const imagePreviewEl = document.getElementById('imagePreview');
       const textSectionsEl = document.getElementById('textSections');
@@ -356,8 +358,8 @@
       const moveUpButtonEl = document.getElementById('moveUpButton');
       const moveDownButtonEl = document.getElementById('moveDownButton');
 
-      const pollIntervalMs = 200;
-      const saveDebounceMs = 350;
+      const pollIntervalMs = BOOTSTRAP_CONFIG.pollIntervalMs;
+      const saveDebounceMs = BOOTSTRAP_CONFIG.saveDebounceMs;
 
       let nextRequestId = 0;
       let latestAcceptedRequestId = 0;
@@ -386,6 +388,10 @@
       function getConfig(response) {
         if (response && response.config) {
           return response.config;
+        }
+
+        if (BOOTSTRAP_CONFIG) {
+          return BOOTSTRAP_CONFIG;
         }
 
         throw new Error('Missing preview config.');
@@ -629,15 +635,19 @@
         };
       }
 
-      function getDefaultTextFrameMetrics() {
-        return createTextFrameMetrics(20.25, 4.25);
+      function getDefaultTextFrameMetrics(config) {
+        const effectiveConfig = config || BOOTSTRAP_CONFIG;
+        return createTextFrameMetrics(
+          effectiveConfig.textFrameBaseWidthUnits + effectiveConfig.textFrameSizePaddingUnits,
+          effectiveConfig.textFrameBaseHeightUnits + effectiveConfig.textFrameSizePaddingUnits
+        );
       }
 
       function getTextFrameMetrics(columns, config) {
         const widthColumn = findColumnByNormalizedLabel(columns, normalizeLabel(config.widthHeaderName));
         const heightColumn = findColumnByNormalizedLabel(columns, normalizeLabel(config.heightHeaderName));
-        const widthUnits = (parsePositiveNumber(widthColumn ? widthColumn.text : '') || 20) + 0.25;
-        const heightUnits = (parsePositiveNumber(heightColumn ? heightColumn.text : '') || 4) + 0.25;
+        const widthUnits = (parsePositiveNumber(widthColumn ? widthColumn.text : '') || config.textFrameBaseWidthUnits) + config.textFrameSizePaddingUnits;
+        const heightUnits = (parsePositiveNumber(heightColumn ? heightColumn.text : '') || config.textFrameBaseHeightUnits) + config.textFrameSizePaddingUnits;
         return createTextFrameMetrics(widthUnits, heightUnits);
       }
 
@@ -1087,6 +1097,7 @@
       }
 
       function renderInitialLayout() {
+        const config = getConfig(null);
         if (slotStates.length === 0) {
           slotStates = [
             { target: null, targetFingerprint: '', editable: false, label: 'ー', draftValue: '', isDirty: false, debounceTimer: null, saveToken: 0, editLockTarget: null, editLockFingerprint: '' },
@@ -1110,7 +1121,7 @@
           view.preview.style.fontFamily = '';
           view.hint.textContent = '';
           view.hint.style.display = 'none';
-          applyTextSizing(view, getDefaultTextFrameMetrics());
+          applyTextSizing(view, getDefaultTextFrameMetrics(config));
         });
         selectionChipEl.textContent = formatSelectionChip(internalSelection);
       }
