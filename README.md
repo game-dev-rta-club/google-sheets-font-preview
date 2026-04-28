@@ -6,11 +6,11 @@ It is useful for localization, translation review, font-aware copy checking, and
 
 ## Features
 
-### Show font-based text preview in a Google Sheets sidebar
+### Review and edit text with real fonts in a Google Sheets sidebar
 
-Preview spreadsheet text inside a Google Sheets sidebar while keeping the review workflow close to the source data.
+Open the sidebar next to your sheet to preview text with local fonts, compare multiple fields, and make edits without leaving the spreadsheet workflow.
 
-![Font-based text preview in a Google Sheets sidebar](docs/images/readme-summary.png)
+![Review and edit text with real fonts in a Google Sheets sidebar](docs/images/readme-summary.png)
 
 ### Set fonts by drag and drop from your PC
 
