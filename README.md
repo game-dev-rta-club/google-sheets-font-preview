@@ -4,25 +4,31 @@ Google Sheets Font Preview is a Google Apps Script sidebar for reviewing and edi
 
 It is useful for localization, translation review, font-aware copy checking, and any workflow where people need to compare spreadsheet text with its actual visual look before using it in an app, website, game, document, or other product.
 
-![Google Sheets Font Preview summary](docs/images/readme-summary.png)
-
 ## Features
 
 ### Show font-based text preview in a Google Sheets sidebar
 
 Preview spreadsheet text inside a Google Sheets sidebar while keeping the review workflow close to the source data.
 
+![Font-based text preview in a Google Sheets sidebar](docs/images/readme-summary.png)
+
 ### Set fonts by drag and drop from your PC
 
 Load local font files (`.ttf`, `.otf`, `.woff`, `.woff2`) directly into the sidebar and preview text with the assigned font.
 
-### Match preview size with width and height columns
+![Set fonts by drag and drop](docs/images/localfont.png)
 
-Use `width` and `height` columns to size the preview area so the text is shown closer to its intended input field size.
+### Edit in real time while previewing text
+
+Edit text directly from the sidebar while checking how it fits inside `width` and `height` constraints. This also helps reveal missing or unsupported glyphs in the selected font.
+
+![Real-time editing and size-aware preview](docs/images/realtime.png)
 
 ### Add screenshot and note context for translators
 
 Use `screenshot` and `note` columns to show extra context needed for translation, review, and QA work.
+
+![Screenshot and note context](docs/images/note.png)
 
 ## Quick Start
 
