@@ -67,6 +67,8 @@ Then reload the spreadsheet and open `Localization > Font Preview`.
 
 `setup-clasp` also copies the required project files into the current directory.
 
+During the first setup, Google may show an "app isn't verified" warning for the Apps Script OAuth flow. If you are the developer of the target sheet or script project, continue with your developer account and approve the requested access to finish setup.
+
 You can pass your Apps Script URL or raw `scriptId` directly to setup:
 
 ```bash
