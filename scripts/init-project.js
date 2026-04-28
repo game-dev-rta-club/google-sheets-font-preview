@@ -54,9 +54,6 @@ function main() {
 
   console.log('');
   console.log('Project files are ready.');
-  console.log('Next steps:');
-  console.log('1. google-sheets-font-preview setup-clasp');
-  console.log('2. google-sheets-font-preview push-clasp');
   console.log('');
 }
 

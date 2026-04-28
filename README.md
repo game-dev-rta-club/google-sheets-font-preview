@@ -39,7 +39,6 @@ Use `screenshot` and `note` columns to show extra context needed for translation
 Run these commands inside an empty working directory or inside the folder where you want to keep the Apps Script project files:
 
 ```bash
-npx github:game-dev-rta-club/google-sheets-font-preview init
 npx github:game-dev-rta-club/google-sheets-font-preview setup-clasp
 npx github:game-dev-rta-club/google-sheets-font-preview push-clasp
 ```
@@ -66,7 +65,9 @@ npm run push-clasp
 
 Then reload the spreadsheet and open `Localization > Font Preview`.
 
-You can also pass your Apps Script URL or raw `scriptId` to setup:
+`setup-clasp` also copies the required project files into the current directory.
+
+You can pass your Apps Script URL or raw `scriptId` directly to setup:
 
 ```bash
 npm run setup-clasp -- https://script.google.com/home/projects/<scriptId>/edit

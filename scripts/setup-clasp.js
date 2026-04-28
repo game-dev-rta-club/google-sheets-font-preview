@@ -3,6 +3,7 @@ const path = require('path');
 const readline = require('readline');
 const { spawnSync } = require('child_process');
 const { getClaspBinPath } = require('./clasp-bin-path');
+const { main: initProject } = require('./init-project');
 
 const packageRoot = path.resolve(__dirname, '..');
 const projectRoot = process.cwd();
@@ -172,6 +173,8 @@ async function runStepThreeAppsScriptApi() {
 }
 
 async function main() {
+  initProject();
+
   const argScriptId = process.argv[2];
   const rawValue = isValidScriptId(argScriptId) ? argScriptId : await promptScriptId();
   const scriptId = normalizeScriptId(rawValue);

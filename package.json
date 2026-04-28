@@ -6,12 +6,8 @@
     "google-sheets-font-preview": "scripts/cli.js"
   },
   "scripts": {
-    "init": "node scripts/init-project.js",
     "setup-clasp": "node scripts/setup-clasp.js",
-    "login-clasp": "clasp login",
-    "push-clasp": "clasp push --force",
-    "pull-clasp": "clasp pull",
-    "open-clasp": "clasp open"
+    "push-clasp": "clasp push --force"
   },
   "devDependencies": {
     "@google/clasp": "^2.5.0"
