@@ -9,7 +9,7 @@
     "setup-clasp": "node scripts/setup-clasp.js",
     "push-clasp": "clasp push --force"
   },
-  "devDependencies": {
+  "dependencies": {
     "@google/clasp": "^2.5.0"
   }
 }
