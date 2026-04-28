@@ -1,138 +1,67 @@
-# Google Sheets Font Preview for Game Localization
+# Google Sheets Font Preview
 
-A Google Sheets sidebar built with Google Apps Script for reviewing **game localization text with local fonts**.
+Google Sheets Font Preview is a Google Apps Script sidebar for reviewing and editing large amounts of text in **Google Sheets** while previewing it with **real local font files**.
 
-This tool helps translators, localization QA, and game developers preview spreadsheet content inside **Google Sheets** while applying **real local font files** (`.ttf`, `.otf`, `.woff`, `.woff2`) by drag and drop. It is designed for teams that manage localized strings in spreadsheets and need a quick way to check how text will look with language-specific fonts before moving back into the game engine.
-
-## Why this exists
-
-Many game teams manage localization in spreadsheets, but it is still hard to answer questions like:
-
-- Does this translation still fit when rendered with the actual font?
-- Does the line count feel right for this language?
-- Does the screenshot next to the text still match the current row?
-- Can translators and QA review text visually without opening the game every time?
-
-This project focuses on that workflow.
+It is useful for localization, translation review, font-aware copy checking, and any workflow where people need to compare spreadsheet text with its actual visual look before using it in an app, website, game, document, or other product.
 
 ## Features
 
-- Google Sheets sidebar powered by **Google Apps Script**
-- Optimized for **game localization preview**
-- Reads the selected spreadsheet row using the first header row
-- Shows a **screenshot/image preview** from an `image` column
-- Shows **Base Language** and **Localization** text preview panels
-- Supports per-language **font assignment** by drag and drop
-- Supports local font files without uploading them to a server
-- Lets you move the internal preview cursor up/down quickly for review work
-- Lets you write text back to editable cells from the sidebar
-- Configurable through a dedicated user-facing config file
+### Show font-based text preview in a Google Sheets sidebar
 
-## Good fit
+Preview spreadsheet text inside a Google Sheets sidebar while keeping the review workflow close to the source data.
 
-This project is especially useful if you:
+### Set fonts by drag and drop from your PC
 
-- use **Google Sheets** as part of your localization workflow
-- work on **games** or UI-heavy interactive content
-- need **font-aware translation preview**
-- want a lightweight tool that translators can use without learning a full design tool
+Load local font files (`.ttf`, `.otf`, `.woff`, `.woff2`) directly into the sidebar and preview text with the assigned font.
 
-## Requirements
+### Match preview size with width and height columns
 
-- A Google account with access to the target spreadsheet
-- Google Sheets
-- Google Apps Script
-- Node.js if you want to manage the script with `clasp`
+Use `width` and `height` columns to size the preview area so the text is shown closer to its intended input field size.
 
-## Project structure
+### Add screenshot and note context for translators
 
-- [`src/Code.gs`](/Users/sakatayusuke/superhookgirl/development/google-sheets-font-preview/src/Code.gs): Apps Script server-side logic
-- [`src/Sidebar.html`](/Users/sakatayusuke/superhookgirl/development/google-sheets-font-preview/src/Sidebar.html): sidebar UI
-- [`src/Config.gs`](/Users/sakatayusuke/superhookgirl/development/google-sheets-font-preview/src/Config.gs): user-editable project settings
-- [`scripts/setup-clasp.js`](/Users/sakatayusuke/superhookgirl/development/google-sheets-font-preview/scripts/setup-clasp.js): guided local setup for `clasp`
+Use `screenshot` and `note` columns to show extra context needed for translation, review, and QA work.
 
-## Quick start
+## Quick Start
 
-### Option 1: use it directly in Apps Script
+### Use directly in Apps Script
 
 1. Open your target Google Sheet.
 2. Open `Extensions > Apps Script`.
-3. Copy the contents of:
-   - [`src/Code.gs`](/Users/sakatayusuke/superhookgirl/development/google-sheets-font-preview/src/Code.gs)
-   - [`src/Sidebar.html`](/Users/sakatayusuke/superhookgirl/development/google-sheets-font-preview/src/Sidebar.html)
-   - [`src/Config.gs`](/Users/sakatayusuke/superhookgirl/development/google-sheets-font-preview/src/Config.gs)
-4. Save the Apps Script project.
+3. Copy these files into the Apps Script project:
+   - [`src/Code.gs`](src/Code.gs)
+   - [`src/Sidebar.html`](src/Sidebar.html)
+   - [`src/Config.gs`](src/Config.gs)
+4. Save the project.
 5. Reload the spreadsheet.
 6. Open `Localization > Font Preview`.
 
-### Option 2: manage it locally with clasp
-
-1. Install dependencies:
+### Use with clasp
 
 ```bash
 npm install
-```
-
-2. Run the guided setup:
-
-```bash
 npm run setup-clasp
+npm run push-clasp
 ```
 
-You can also pass the Apps Script URL or raw `scriptId` directly:
+Then reload the spreadsheet and open `Localization > Font Preview`.
+
+You can also pass your Apps Script URL or raw `scriptId` to setup:
 
 ```bash
 npm run setup-clasp -- https://script.google.com/home/projects/<scriptId>/edit
 ```
 
-3. Push the latest code:
-
-```bash
-npm run push-clasp
-```
-
-4. Reload the spreadsheet.
-5. Open `Localization > Font Preview`.
-
-## Configuration
-
-Edit [`src/Config.gs`](/Users/sakatayusuke/superhookgirl/development/google-sheets-font-preview/src/Config.gs) to customize the tool.
-
-Examples of configurable values:
-
-- menu name
-- sidebar title
-- base language column header
-- image column header
-- width / height column headers
-- polling interval
-- text frame sizing defaults
-
-This is the main customization point for users who:
-
-- do not want to fork the repository and just want to tweak their local Apps Script copy
-- do want to fork the repository and maintain a project-specific version over time
-
-## Notes
-
-- Fonts are loaded only in the current browser session.
-- Font files are **not uploaded** to Google Drive or an external server.
-- After reloading the spreadsheet, fonts need to be loaded again.
-- Empty header cells in row 1 are ignored.
-- The tool is optimized for practical review speed, not perfect real-time synchronization with spreadsheet selection.
-
 ## Contributing
 
 Contributions are welcome.
 
-If you want to help:
+- Open an issue for bugs, UX problems, or feature requests
+- Open a pull request for fixes or improvements
+- Improve documentation, setup flow, or usability
 
-- open an issue for bugs, UX problems, or feature ideas
-- submit a pull request for fixes or improvements
-- improve the documentation for setup, localization workflows, or accessibility
-
-Please read [CONTRIBUTING.md](/Users/sakatayusuke/superhookgirl/development/google-sheets-font-preview/CONTRIBUTING.md) before opening a pull request.
+For contribution details, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
-This project is licensed under the MIT License. See [LICENSE](/Users/sakatayusuke/superhookgirl/development/google-sheets-font-preview/LICENSE).
+MIT. See [LICENSE](LICENSE).

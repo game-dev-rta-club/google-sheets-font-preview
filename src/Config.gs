@@ -6,8 +6,9 @@ var FONT_PREVIEW_CONFIG = {
   },
   rowWindowRadius: 5,
   headers: {
-    image: 'image',
-    baseLanguage: 'jp',
+    screenshot: 'screenshot',
+    note: 'note',
+    baseLanguage: 'en',
     width: 'width',
     height: 'height',
   },

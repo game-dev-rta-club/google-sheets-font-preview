@@ -1,8 +1,8 @@
 function getReservedHeaderNames_() {
   var config = getFontPreviewConfig_();
   return [
-    config.headers.image,
-    config.headers.baseLanguage,
+    config.headers.screenshot,
+    config.headers.note,
     config.headers.width,
     config.headers.height,
   ];
@@ -11,7 +11,8 @@ function getReservedHeaderNames_() {
 function createClientPreviewConfig_() {
   var config = getFontPreviewConfig_();
   return {
-    imageHeaderName: config.headers.image,
+    screenshotHeaderName: config.headers.screenshot,
+    noteHeaderName: config.headers.note,
     baseLanguageHeaderName: config.headers.baseLanguage,
     widthHeaderName: config.headers.width,
     heightHeaderName: config.headers.height,

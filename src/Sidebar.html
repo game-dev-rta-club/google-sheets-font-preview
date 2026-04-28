@@ -52,6 +52,10 @@
         text-transform: uppercase;
       }
 
+      .section-title.note-title {
+        margin-top: 8px;
+      }
+
       .toolbar {
         display: flex;
         gap: 12px;
@@ -130,6 +134,17 @@
         justify-content: center;
       }
 
+      .preview-screen.placeholder {
+        height: calc(1.2em + 8px);
+        min-height: calc(1.2em + 8px);
+        padding: 4px 8px;
+        background: #f1ede6;
+        border-style: dashed;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+      }
+
       .preview-screen img {
         height: 100%;
         width: auto;
@@ -139,12 +154,48 @@
         background: transparent;
       }
 
+      .preview-note {
+        height: calc(1.4em * 2 + 12px);
+        padding: 6px 8px;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        font-size: 12px;
+        line-height: 1.4;
+        color: var(--subtle);
+        white-space: pre-wrap;
+        word-break: break-word;
+        overflow-y: auto;
+      }
+
+      .preview-note.placeholder {
+        height: calc(1.2em + 8px);
+        min-height: calc(1.2em + 8px);
+        padding: 4px 8px;
+        background: #f1ede6;
+        border-style: dashed;
+        font-size: 11px;
+        line-height: 1.2;
+        color: #978f84;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
       .preview-empty {
         color: #7c766e;
         text-align: center;
         padding: 24px;
         line-height: 1.6;
         font-size: 14px;
+      }
+
+      .preview-empty.placeholder {
+        width: 100%;
+        padding: 0;
+        text-align: left;
+        font-size: 11px;
+        line-height: 1.2;
+        color: #978f84;
       }
 
       .text-preview {
@@ -246,6 +297,14 @@
         text-overflow: ellipsis;
       }
 
+      .slot-helper {
+        margin-top: 4px;
+        font-size: 10px;
+        line-height: 1.3;
+        color: #978f84;
+        white-space: pre-wrap;
+      }
+
       .status {
         min-height: 18px;
         font-size: 12px;
@@ -324,6 +383,8 @@
         <div id="imagePreview" class="preview-screen">
           <div class="preview-empty">No Image</div>
         </div>
+        <div class="section-title note-title">Note</div>
+        <div id="notePreview" class="preview-note">ー</div>
       </section>
 
       <div id="textSections" class="stack"></div>
@@ -352,6 +413,7 @@
 
       const statusEl = document.getElementById('status');
       const imagePreviewEl = document.getElementById('imagePreview');
+      const notePreviewEl = document.getElementById('notePreview');
       const textSectionsEl = document.getElementById('textSections');
       const selectionChipEl = document.getElementById('selectionChip');
       const selectButtonEl = document.getElementById('selectButton');
@@ -374,6 +436,7 @@
       let selectionCommitInFlight = false;
       let ignorePollResponsesThroughRequestId = 0;
       let scrollbarWidthPx = null;
+      let preferredBaseColumnKey = '';
 
       function setStatus(message, isError) {
         statusEl.textContent = message || '';
@@ -578,7 +641,8 @@
         }
 
         const normalizedLabel = normalizeLabel(column.label);
-        return normalizedLabel === normalizeLabel(config.imageHeaderName)
+        return normalizedLabel === normalizeLabel(config.screenshotHeaderName)
+          || normalizedLabel === normalizeLabel(config.noteHeaderName)
           || normalizedLabel === normalizeLabel(config.widthHeaderName)
           || normalizedLabel === normalizeLabel(config.heightHeaderName);
       }
@@ -604,6 +668,22 @@
 
       function getDefaultLocalizationColumn(columns, config) {
         return getPreviousLocalizationColumn(columns, config) || null;
+      }
+
+      function getDefaultBaseColumn(columns, config) {
+        if (preferredBaseColumnKey) {
+          const preferredColumn = findColumnByKey(columns, preferredBaseColumnKey);
+          if (preferredColumn && !isFrozenLocalizationColumn(columns, preferredColumn.key, config)) {
+            return preferredColumn;
+          }
+        }
+
+        const defaultColumn = findColumnByNormalizedLabel(columns, normalizeLabel(config.baseLanguageHeaderName));
+        if (defaultColumn && !isFrozenLocalizationColumn(columns, defaultColumn.key, config)) {
+          return defaultColumn;
+        }
+
+        return null;
       }
 
       function parsePositiveNumber(value) {
@@ -678,16 +758,11 @@
       }
 
       function ensureSlotStates(columns, config) {
-        const baseColumn = findColumnByNormalizedLabel(columns, normalizeLabel(config.baseLanguageHeaderName));
+        const baseColumn = getDefaultBaseColumn(columns, config);
         const selectedLocalizationColumn = findColumnByKey(columns, internalSelection ? internalSelection.headerKey : '');
         const localizationColumn = selectedLocalizationColumn && !isFrozenLocalizationColumn(columns, selectedLocalizationColumn.key, config)
           ? selectedLocalizationColumn
           : getDefaultLocalizationColumn(columns, config);
-        const localizationEditable = Boolean(
-          localizationColumn
-          && normalizeLabel(localizationColumn.label) !== normalizeLabel(config.baseLanguageHeaderName)
-        );
-
         const nextStates = [];
         for (let i = 0; i < 2; i++) {
           const existing = slotStates[i] || {};
@@ -699,7 +774,7 @@
             editable = false;
           } else {
             targetColumn = localizationColumn;
-            editable = Boolean(localizationEditable);
+            editable = Boolean(localizationColumn);
           }
 
           const target = targetColumn && internalSelection
@@ -747,27 +822,45 @@
       }
 
       function renderImageSection(columns, config) {
-        const imageColumn = findColumnByNormalizedLabel(columns, normalizeLabel(config.imageHeaderName));
+        const screenshotColumn = findColumnByNormalizedLabel(columns, normalizeLabel(config.screenshotHeaderName));
+        const noteColumn = findColumnByNormalizedLabel(columns, normalizeLabel(config.noteHeaderName));
         imagePreviewEl.innerHTML = '';
+        imagePreviewEl.className = 'preview-screen';
 
-        if (imageColumn && imageColumn.imageUrl) {
+        if (screenshotColumn && screenshotColumn.imageUrl) {
           const img = document.createElement('img');
-          img.src = imageColumn.imageUrl;
-          img.alt = imageColumn.label;
+          img.src = screenshotColumn.imageUrl;
+          img.alt = screenshotColumn.label;
           imagePreviewEl.appendChild(img);
-          return;
+        } else {
+          const empty = document.createElement('div');
+          empty.className = screenshotColumn ? 'preview-empty' : 'preview-empty placeholder';
+          empty.textContent = screenshotColumn ? 'No Image' : 'Add a "screenshot" column to show images.';
+          if (!screenshotColumn) {
+            imagePreviewEl.className = 'preview-screen placeholder';
+          }
+          imagePreviewEl.appendChild(empty);
         }
 
-        const empty = document.createElement('div');
-        empty.className = 'preview-empty';
-        empty.textContent = 'No Image';
-        imagePreviewEl.appendChild(empty);
+        notePreviewEl.className = noteColumn ? 'preview-note' : 'preview-note placeholder';
+        notePreviewEl.textContent = noteColumn ? (noteColumn.text || 'ー') : 'Add a "note" column to show notes.';
+      }
+
+      function getBasePanelHelperText(columns, config) {
+        const messages = [];
+        if (!findColumnByNormalizedLabel(columns, normalizeLabel(config.widthHeaderName))) {
+          messages.push(`Add a "${config.widthHeaderName}" column to match the real width.`);
+        }
+        if (!findColumnByNormalizedLabel(columns, normalizeLabel(config.heightHeaderName))) {
+          messages.push(`Add a "${config.heightHeaderName}" column to match the real height.`);
+        }
+        return messages.join('\n');
       }
 
       function queueTextSave(slotIndex) {
         const slotState = slotStates[slotIndex];
         const effectiveTarget = slotState && (slotState.editLockTarget || slotState.target);
-        if (!slotState || !effectiveTarget || !slotState.fontEditable) {
+        if (!slotState || !effectiveTarget || !slotState.editable) {
           return;
         }
 
@@ -839,43 +932,43 @@
         const left = document.createElement('div');
         left.className = 'left-toolbar';
 
-        const fixedLabel = document.createElement('button');
-        fixedLabel.type = 'button';
-        fixedLabel.disabled = true;
-        left.appendChild(fixedLabel);
+        const columnSelectWrap = document.createElement('div');
+        columnSelectWrap.className = 'select-wrap';
+        const columnSelect = document.createElement('select');
+        columnSelect.dataset.slotIndex = String(slotIndex);
+        columnSelectWrap.appendChild(columnSelect);
+        left.appendChild(columnSelectWrap);
 
-        let localizationSelectWrap = null;
-        let localizationSelect = null;
-        if (slotIndex === 1) {
-          localizationSelectWrap = document.createElement('div');
-          localizationSelectWrap.className = 'select-wrap';
-          localizationSelect = document.createElement('select');
-          localizationSelect.dataset.slotIndex = String(slotIndex);
-          localizationSelectWrap.appendChild(localizationSelect);
-          left.appendChild(localizationSelectWrap);
-          fixedLabel.style.display = 'none';
+        columnSelect.addEventListener('change', (event) => {
+          const nextKey = event.target.value;
+          if (!nextKey) {
+            return;
+          }
 
-          localizationSelect.addEventListener('change', (event) => {
-            const nextKey = event.target.value;
-            if (!internalSelection || !nextKey) {
-              return;
-            }
-
-            const displayedColumns = getDisplayedColumns();
-            const nextColumn = findColumnByKey(displayedColumns, nextKey);
-            if (!nextColumn) {
-              return;
-            }
-
-            internalSelection = {
-              ...internalSelection,
-              column: nextColumn.columnIndex,
-              headerKey: nextColumn.key,
-              a1Notation: buildA1Notation(internalSelection.row, nextColumn.columnIndex),
-            };
+          if (slotIndex === 0) {
+            preferredBaseColumnKey = nextKey;
             renderCurrentView();
-          });
-        }
+            return;
+          }
+
+          if (!internalSelection) {
+            return;
+          }
+
+          const displayedColumns = getDisplayedColumns();
+          const nextColumn = findColumnByKey(displayedColumns, nextKey);
+          if (!nextColumn) {
+            return;
+          }
+
+          internalSelection = {
+            ...internalSelection,
+            column: nextColumn.columnIndex,
+            headerKey: nextColumn.key,
+            a1Notation: buildA1Notation(internalSelection.row, nextColumn.columnIndex),
+          };
+          renderCurrentView();
+        });
 
         const right = document.createElement('div');
         right.className = 'right-toolbar';
@@ -917,6 +1010,11 @@
         hint.className = 'font-hint';
         hint.style.display = 'none';
         card.appendChild(hint);
+
+        const helper = document.createElement('div');
+        helper.className = 'slot-helper';
+        helper.style.display = 'none';
+        card.appendChild(helper);
 
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach((eventName) => {
           dropzone.addEventListener(eventName, preventDefaults);
@@ -1004,7 +1102,7 @@
 
         textSectionsEl.appendChild(card);
 
-        return { card, fixedLabel, localizationSelectWrap, localizationSelect, dropzone, fileInput, frameOuter, frameInner, preview, hint };
+        return { card, columnSelectWrap, columnSelect, dropzone, fileInput, frameOuter, frameInner, preview, hint, helper };
       }
 
       function ensureSlotViews() {
@@ -1030,27 +1128,18 @@
           const nextValue = getSlotDisplayValue(slotState, targetColumn);
           const isFocused = document.activeElement === view.preview;
 
-          if (slotIndex === 1 && view.localizationSelect) {
+          if (view.columnSelect) {
             const selectableColumns = getSelectableLocalizationColumns(viewColumns, config);
-            view.localizationSelect.innerHTML = '';
+            view.columnSelect.innerHTML = '';
             selectableColumns.forEach((column) => {
               const option = document.createElement('option');
               option.value = column.key;
               option.textContent = column.label || 'ー';
               option.selected = Boolean(effectiveTarget && column.key === effectiveTarget.headerKey);
-              view.localizationSelect.appendChild(option);
+              view.columnSelect.appendChild(option);
             });
-            view.localizationSelect.disabled = selectableColumns.length === 0;
-            if (view.localizationSelectWrap) {
-              view.localizationSelectWrap.style.display = '';
-            }
-            view.fixedLabel.style.display = 'none';
-          } else {
-            view.fixedLabel.textContent = slotState.label || 'ー';
-            view.fixedLabel.style.display = '';
-            if (view.localizationSelectWrap) {
-              view.localizationSelectWrap.style.display = 'none';
-            }
+            view.columnSelect.disabled = selectableColumns.length === 0;
+            view.columnSelectWrap.style.display = '';
           }
 
           view.dropzone.className = `dropzone${slotState.fontEditable ? '' : ' disabled'}`;
@@ -1071,6 +1160,15 @@
 
           if (!isFocused && view.preview.value !== nextValue) {
             view.preview.value = nextValue;
+          }
+
+          if (slotIndex === 0) {
+            const helperText = getBasePanelHelperText(viewColumns, config);
+            view.helper.textContent = helperText;
+            view.helper.style.display = helperText ? 'block' : 'none';
+          } else {
+            view.helper.textContent = '';
+            view.helper.style.display = 'none';
           }
 
           applyTextSizing(view, frameMetrics);
@@ -1108,12 +1206,15 @@
 
         ensureSlotViews();
         imagePreviewEl.innerHTML = '<div class="preview-empty">No Image</div>';
+        notePreviewEl.textContent = '';
         slotViews.forEach((view) => {
-          view.fixedLabel.textContent = 'ー';
-          if (view.localizationSelectWrap) {
-            view.localizationSelectWrap.style.display = 'none';
+          if (view.columnSelectWrap) {
+            view.columnSelectWrap.style.display = '';
           }
-          view.fixedLabel.style.display = '';
+          if (view.columnSelect) {
+            view.columnSelect.innerHTML = '<option selected>ー</option>';
+            view.columnSelect.disabled = true;
+          }
           view.dropzone.className = 'dropzone disabled';
           view.dropzone.tabIndex = -1;
           view.fileInput.disabled = true;
@@ -1122,6 +1223,8 @@
           view.preview.style.fontFamily = '';
           view.hint.textContent = '';
           view.hint.style.display = 'none';
+          view.helper.textContent = '';
+          view.helper.style.display = 'none';
           applyTextSizing(view, getDefaultTextFrameMetrics(config));
         });
         selectionChipEl.textContent = formatSelectionChip(internalSelection);
