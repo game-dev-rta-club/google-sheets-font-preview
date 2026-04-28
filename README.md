@@ -34,6 +34,16 @@ Use `screenshot` and `note` columns to show extra context needed for translation
 
 ## Quick Start
 
+### Use from GitHub with npx
+
+Run these commands inside an empty working directory or inside the folder where you want to keep the Apps Script project files:
+
+```bash
+npx github:game-dev-rta-club/google-sheets-font-preview init
+npx github:game-dev-rta-club/google-sheets-font-preview setup-clasp
+npx github:game-dev-rta-club/google-sheets-font-preview push-clasp
+```
+
 ### Use directly in Apps Script
 
 1. Open your target Google Sheet.
@@ -60,6 +70,12 @@ You can also pass your Apps Script URL or raw `scriptId` to setup:
 
 ```bash
 npm run setup-clasp -- https://script.google.com/home/projects/<scriptId>/edit
+```
+
+If you are using the GitHub-based CLI instead of cloning this repository, you can do the same with:
+
+```bash
+npx github:game-dev-rta-club/google-sheets-font-preview setup-clasp -- https://script.google.com/home/projects/<scriptId>/edit
 ```
 
 ## Contributing

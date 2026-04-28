@@ -2,10 +2,12 @@ const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
 const { spawnSync } = require('child_process');
+const { getClaspBinPath } = require('./clasp-bin-path');
 
-const repoRoot = path.resolve(__dirname, '..');
-const templatePath = path.join(repoRoot, '.clasp.json.example');
-const outputPath = path.join(repoRoot, '.clasp.json');
+const packageRoot = path.resolve(__dirname, '..');
+const projectRoot = process.cwd();
+const templatePath = path.join(packageRoot, '.clasp.json.example');
+const outputPath = path.join(projectRoot, '.clasp.json');
 
 function readTemplate() {
   return fs.readFileSync(templatePath, 'utf8');
@@ -18,9 +20,9 @@ function writeConfig(scriptId) {
 }
 
 function runClaspLogin() {
-  const command = process.platform === 'win32' ? 'npx.cmd' : 'npx';
-  const result = spawnSync(command, ['clasp', 'login'], {
-    cwd: repoRoot,
+  const claspBinPath = getClaspBinPath(packageRoot);
+  const result = spawnSync(process.execPath, [claspBinPath, 'login'], {
+    cwd: projectRoot,
     stdio: 'inherit',
   });
 
@@ -49,7 +51,7 @@ function openUrl(url) {
   }
 
   const result = spawnSync(command, args, {
-    cwd: repoRoot,
+    cwd: projectRoot,
     stdio: 'ignore',
   });
 
@@ -187,12 +189,18 @@ async function main() {
   console.log('');
   console.log('Step 4');
   console.log('- Setup complete.');
-  console.log(`- Created ${path.basename(outputPath)}.`);
-  console.log('- Next command: npm run push-clasp');
+  console.log(`- Created ${outputPath}.`);
+  console.log('- Next command: google-sheets-font-preview push-clasp');
   console.log('');
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+if (require.main === module) {
+  main().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+}
+
+module.exports = {
+  main,
+};
