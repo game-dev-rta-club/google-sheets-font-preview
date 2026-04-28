@@ -192,8 +192,10 @@ async function main() {
   console.log('');
   console.log('Step 4');
   console.log('- Setup complete.');
-  console.log(`- Created ${outputPath}.`);
-  console.log('- Next command: google-sheets-font-preview push-clasp');
+  console.log(`- Your .clasp.json file was created here: ${outputPath}`);
+  console.log('- When you are ready, run one of these commands to upload the files:');
+  console.log('- If you are using GitHub directly: npx github:game-dev-rta-club/google-sheets-font-preview push-clasp');
+  console.log('- If you are using this repository locally: npm run push-clasp');
   console.log('');
 }
 
