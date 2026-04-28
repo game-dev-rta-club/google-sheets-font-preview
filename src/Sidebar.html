@@ -126,7 +126,8 @@
       .preview-screen {
         border: 1px solid var(--line);
         border-radius: 0;
-        height: 135px;
+        width: 100%;
+        aspect-ratio: 16 / 9;
         background: var(--screen-bg);
         overflow: hidden;
         display: flex;
@@ -146,9 +147,8 @@
       }
 
       .preview-screen img {
+        width: 100%;
         height: 100%;
-        width: auto;
-        max-width: 100%;
         object-fit: contain;
         display: block;
         background: transparent;
@@ -283,15 +283,6 @@
         font-size: 9px;
         color: var(--subtle);
         line-height: 1.4;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .font-hint {
-        font-size: 10px;
-        color: var(--subtle);
-        margin-top: 2px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -1006,11 +997,6 @@
         frameOuter.appendChild(frameInner);
         card.appendChild(frameOuter);
 
-        const hint = document.createElement('div');
-        hint.className = 'font-hint';
-        hint.style.display = 'none';
-        card.appendChild(hint);
-
         const helper = document.createElement('div');
         helper.className = 'slot-helper';
         helper.style.display = 'none';
@@ -1102,7 +1088,7 @@
 
         textSectionsEl.appendChild(card);
 
-        return { card, columnSelectWrap, columnSelect, dropzone, fileInput, frameOuter, frameInner, preview, hint, helper };
+        return { card, columnSelectWrap, columnSelect, dropzone, fileInput, frameOuter, frameInner, preview, helper };
       }
 
       function ensureSlotViews() {
@@ -1150,12 +1136,8 @@
 
           if (fontState && fontState.fontFamily) {
             view.preview.style.fontFamily = `"${fontState.fontFamily}"`;
-            view.hint.textContent = fontState.fontLabel;
-            view.hint.style.display = 'block';
           } else {
             view.preview.style.fontFamily = '';
-            view.hint.textContent = '';
-            view.hint.style.display = 'none';
           }
 
           if (!isFocused && view.preview.value !== nextValue) {
@@ -1221,8 +1203,6 @@
           view.preview.disabled = true;
           view.preview.value = '';
           view.preview.style.fontFamily = '';
-          view.hint.textContent = '';
-          view.hint.style.display = 'none';
           view.helper.textContent = '';
           view.helper.style.display = 'none';
           applyTextSizing(view, getDefaultTextFrameMetrics(config));
@@ -1238,8 +1218,8 @@
         const slotState = slotStates[slotIndex];
         const effectiveTarget = slotState && (slotState.editLockTarget || slotState.target);
         const selectedKey = effectiveTarget ? effectiveTarget.headerKey : '';
-        if (!selectedKey || !slotState.editable) {
-          setStatus('This panel is not editable.', true);
+        if (!selectedKey || !slotState.fontEditable) {
+          setStatus('Font cannot be changed for this panel.', true);
           return;
         }
 
