@@ -718,6 +718,7 @@
             target: target,
             targetFingerprint: target ? target.fingerprint : '',
             editable: editable,
+            fontEditable: Boolean(targetColumn),
             label: targetColumn ? targetColumn.label : 'ー',
             draftValue: shouldKeepDraft ? (existing.draftValue || '') : '',
             isDirty: shouldKeepDraft ? Boolean(existing.isDirty) : false,
@@ -766,7 +767,7 @@
       function queueTextSave(slotIndex) {
         const slotState = slotStates[slotIndex];
         const effectiveTarget = slotState && (slotState.editLockTarget || slotState.target);
-        if (!slotState || !effectiveTarget || !slotState.editable) {
+        if (!slotState || !effectiveTarget || !slotState.fontEditable) {
           return;
         }
 
@@ -924,7 +925,7 @@
         ['dragenter', 'dragover'].forEach((eventName) => {
           dropzone.addEventListener(eventName, () => {
             const slotState = slotStates[slotIndex];
-            if (slotState && slotState.editable) {
+            if (slotState && slotState.fontEditable) {
               dropzone.classList.add('dragover');
             }
           });
@@ -938,7 +939,7 @@
 
         dropzone.addEventListener('drop', (event) => {
           const slotState = slotStates[slotIndex];
-          if (!slotState || !slotState.editable) {
+          if (!slotState || !slotState.fontEditable) {
             return;
           }
 
@@ -950,7 +951,7 @@
 
         dropzone.addEventListener('click', () => {
           const slotState = slotStates[slotIndex];
-          if (!slotState || !slotState.editable) {
+          if (!slotState || !slotState.fontEditable) {
             return;
           }
           fileInput.click();
@@ -958,7 +959,7 @@
 
         fileInput.addEventListener('change', (event) => {
           const slotState = slotStates[slotIndex];
-          if (!slotState || !slotState.editable) {
+          if (!slotState || !slotState.fontEditable) {
             return;
           }
 
@@ -1052,9 +1053,9 @@
             }
           }
 
-          view.dropzone.className = `dropzone${slotState.editable ? '' : ' disabled'}`;
-          view.dropzone.tabIndex = slotState.editable ? 0 : -1;
-          view.fileInput.disabled = !slotState.editable;
+          view.dropzone.className = `dropzone${slotState.fontEditable ? '' : ' disabled'}`;
+          view.dropzone.tabIndex = slotState.fontEditable ? 0 : -1;
+          view.fileInput.disabled = !slotState.fontEditable;
           view.preview.disabled = !slotState.editable;
           view.preview.dataset.targetFingerprint = effectiveFingerprint || '';
 
