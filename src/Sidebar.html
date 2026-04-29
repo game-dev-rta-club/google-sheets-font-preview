@@ -313,7 +313,7 @@
       .control-panel {
         display: flex;
         justify-content: space-between;
-        align-items: flex-end;
+        align-items: center;
         gap: 8px;
       }
 
@@ -328,6 +328,12 @@
         flex-direction: column;
         align-items: flex-end;
         gap: 6px;
+      }
+
+      .control-options-row {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 8px;
       }
 
       .control-nav-row {
@@ -544,13 +550,13 @@
               <button id="selectButton" class="selection-action" type="button">Select</button>
             </div>
           </div>
-          <div class="control-actions">
-            <div class="control-nav-row">
-              <button id="moveUpButton" class="nav-button" type="button">▲</button>
-              <button id="moveDownButton" class="nav-button" type="button">▼</button>
-            </div>
-            <button id="settingsButton" class="settings-button" type="button" aria-label="Open options">⚙</button>
+          <div class="control-group">
+            <button id="moveUpButton" class="nav-button" type="button">▲</button>
+            <button id="moveDownButton" class="nav-button" type="button">▼</button>
           </div>
+        </div>
+        <div class="control-options-row">
+          <button id="settingsButton" class="settings-button" type="button" aria-label="Open options">⚙</button>
         </div>
       </section>
 
