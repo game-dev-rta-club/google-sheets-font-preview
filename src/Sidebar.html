@@ -1229,6 +1229,10 @@
           return slotState.draftValue;
         }
 
+        if (targetColumn && targetColumn.isLoading) {
+          return 'Loading...';
+        }
+
         if (isHeaderRowTarget) {
           return '';
         }
