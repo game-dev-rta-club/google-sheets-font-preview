@@ -33,20 +33,28 @@ function sanitizeProjectOptions_(rawOptions) {
   var raw = rawOptions || {};
 
   var visibleSections = raw.visibleSections || {};
-  var textDisplay = raw.textDisplay || {};
+  var textPreview = raw.textPreview || raw.textDisplay || {};
   var languageSettings = raw.languageSettings || {};
   var fixedStrings = raw.fixedStrings || {};
 
   return {
     visibleSections: {
+      previewCell: visibleSections.previewCell !== false,
       screenshot: visibleSections.screenshot !== false,
       note: visibleSections.note !== false,
       baseLanguage: visibleSections.baseLanguage !== false,
       localization: visibleSections.localization !== false,
     },
-    textDisplay: {
-      defaultFontSizePx: Math.max(8, Number(textDisplay.defaultFontSizePx) || defaults.textDisplay.defaultFontSizePx),
-      fixedFontSize: Boolean(textDisplay.fixedFontSize),
+    textPreview: {
+      sharedPreviewSizePx: Math.max(
+        8,
+        Number(textPreview.sharedPreviewSizePx || textPreview.defaultFontSizePx) || defaults.textPreview.sharedPreviewSizePx
+      ),
+      useSharedPreviewSize: Boolean(
+        textPreview.useSharedPreviewSize !== undefined
+          ? textPreview.useSharedPreviewSize
+          : textPreview.fixedFontSize
+      ),
     },
     languageSettings: {
       defaultLanguage: String(languageSettings.defaultLanguage || defaults.languageSettings.defaultLanguage).trim() || defaults.languageSettings.defaultLanguage,
@@ -127,8 +135,8 @@ function createClientPreviewConfig_() {
     projectReservedHeaderNames: reservedHeaderNames,
     userIgnoredColumns: options.languageSettings.ignoredColumns,
     visibleSections: options.visibleSections,
-    defaultFontSizePx: options.textDisplay.defaultFontSizePx,
-    fixedFontSize: options.textDisplay.fixedFontSize,
+    sharedPreviewSizePx: options.textPreview.sharedPreviewSizePx,
+    useSharedPreviewSize: options.textPreview.useSharedPreviewSize,
     pollIntervalMs: config.timing.pollIntervalMs,
     saveDebounceMs: config.timing.saveDebounceMs,
     textFrameBaseWidthUnits: config.textFrame.baseWidthUnits,

@@ -7,14 +7,15 @@ var FONT_PREVIEW_CONFIG = {
   rowWindowRadius: 5,
   projectOptions: {
     visibleSections: {
+      previewCell: true,
       screenshot: true,
       note: true,
       baseLanguage: true,
       localization: true,
     },
-    textDisplay: {
-      defaultFontSizePx: 20,
-      fixedFontSize: false,
+    textPreview: {
+      sharedPreviewSizePx: 20,
+      useSharedPreviewSize: false,
     },
     languageSettings: {
       defaultLanguage: 'en',

@@ -540,7 +540,7 @@
 
       <div id="textSections" class="stack"></div>
 
-      <section class="card">
+      <section id="previewControlCard" class="card">
         <div class="control-panel">
           <div class="control-group-column">
             <div class="control-label">Preview Cell</div>
@@ -556,7 +556,7 @@
         </div>
       </section>
 
-      <section class="card">
+      <section id="optionsCard" class="card">
         <div class="control-options-row">
           <button id="settingsButton" class="settings-button" type="button" aria-label="Open options">⚙</button>
         </div>
@@ -573,6 +573,7 @@
           <h3>Visible Panels</h3>
           <p class="modal-copy">Choose which parts of the sidebar should be visible for everyone using this spreadsheet.</p>
           <div class="settings-grid single-column">
+            <div class="checkbox-row"><input id="optShowPreviewCell" type="checkbox"><label for="optShowPreviewCell"><strong>PREVIEW CELL</strong><br>Show the current preview cell and row navigation buttons.</label></div>
             <div class="checkbox-row"><input id="optShowScreenshot" type="checkbox"><label for="optShowScreenshot"><strong>SCREENSHOT</strong><br>Show the screenshot preview area.</label></div>
             <div class="checkbox-row"><input id="optShowNote" type="checkbox"><label for="optShowNote"><strong>NOTE</strong><br>Show the note area below the screenshot.</label></div>
             <div class="checkbox-row"><input id="optShowBaseLanguage" type="checkbox"><label for="optShowBaseLanguage"><strong>BASE LANGUAGE</strong><br>Show the base language preview panel.</label></div>
@@ -582,15 +583,15 @@
 
         <section class="modal-section">
           <h3>Text Preview</h3>
-          <p class="modal-copy">Control the default preview font size and whether the preview should stop resizing when width and height columns are missing.</p>
+          <p class="modal-copy">Control the shared preview size and whether every text should use the same preview size instead of reading width and height columns.</p>
           <div class="settings-grid">
             <div class="field-row">
-              <label for="optDefaultFontSize">Default font size (px)</label>
-              <input id="optDefaultFontSize" type="number" min="8" step="1">
+              <label for="optSharedPreviewSize">Default preview size (px)</label>
+              <input id="optSharedPreviewSize" type="number" min="8" step="1">
             </div>
             <div class="checkbox-row">
-              <input id="optFixedFontSize" type="checkbox">
-              <label for="optFixedFontSize"><strong>Do not resize text automatically</strong><br>Use the default font size and hide width/height warnings when those columns are missing.</label>
+              <input id="optUseSharedPreviewSize" type="checkbox">
+              <label for="optUseSharedPreviewSize"><strong>Use the same preview size for all texts</strong><br>Ignore width and height columns and display every text with the same preview size.</label>
             </div>
           </div>
         </section>
@@ -649,6 +650,7 @@
 
       const statusEl = document.getElementById('status');
       const contextCardEl = document.getElementById('contextCard');
+      const previewControlCardEl = document.getElementById('previewControlCard');
       const screenshotTitleEl = document.getElementById('screenshotTitle');
       const imagePreviewEl = document.getElementById('imagePreview');
       const noteTitleEl = document.getElementById('noteTitle');
@@ -662,12 +664,13 @@
       const settingsModalEl = document.getElementById('settingsModal');
       const settingsCancelButtonEl = document.getElementById('settingsCancelButton');
       const settingsSaveButtonEl = document.getElementById('settingsSaveButton');
+      const optShowPreviewCellEl = document.getElementById('optShowPreviewCell');
       const optShowScreenshotEl = document.getElementById('optShowScreenshot');
       const optShowNoteEl = document.getElementById('optShowNote');
       const optShowBaseLanguageEl = document.getElementById('optShowBaseLanguage');
       const optShowLocalizationEl = document.getElementById('optShowLocalization');
-      const optDefaultFontSizeEl = document.getElementById('optDefaultFontSize');
-      const optFixedFontSizeEl = document.getElementById('optFixedFontSize');
+      const optSharedPreviewSizeEl = document.getElementById('optSharedPreviewSize');
+      const optUseSharedPreviewSizeEl = document.getElementById('optUseSharedPreviewSize');
       const optDefaultLanguageEl = document.getElementById('optDefaultLanguage');
       const optReservedColumnsEl = document.getElementById('optReservedColumns');
       const optIgnoredColumnsEl = document.getElementById('optIgnoredColumns');
@@ -730,8 +733,8 @@
         return getProjectOptions(config).languageSettings || {};
       }
 
-      function getTextDisplaySettings(config) {
-        return getProjectOptions(config).textDisplay || {};
+      function getTextPreviewSettings(config) {
+        return getProjectOptions(config).textPreview || {};
       }
 
       function getFixedStrings(config) {
@@ -1007,6 +1010,10 @@
       }
 
       function getTextFrameMetrics(columns, config) {
+        if (getTextPreviewSettings(config).useSharedPreviewSize) {
+          return getDefaultTextFrameMetrics(config);
+        }
+
         const widthColumn = findColumnByNormalizedLabel(columns, normalizeLabel(config.widthHeaderName));
         const heightColumn = findColumnByNormalizedLabel(columns, normalizeLabel(config.heightHeaderName));
         const widthUnits = (parsePositiveNumber(widthColumn ? widthColumn.text : '') || config.textFrameBaseWidthUnits) + config.textFrameSizePaddingUnits;
@@ -1018,9 +1025,9 @@
         const outerUsableWidth = Math.max(20, frameOuter.clientWidth);
         const outerUsableHeight = Math.max(16, frameOuter.clientHeight);
         const reservedScrollbarWidth = getScrollbarWidthPx();
-        const textDisplay = getTextDisplaySettings(currentConfig);
-        const fontSize = textDisplay.fixedFontSize
-          ? Math.max(8, Number(textDisplay.defaultFontSizePx) || 20)
+        const textPreview = getTextPreviewSettings(currentConfig);
+        const fontSize = textPreview.useSharedPreviewSize
+          ? Math.max(8, Number(textPreview.sharedPreviewSizePx) || 20)
           : Math.max(8, Math.min(
               (outerUsableWidth - reservedScrollbarWidth) / Math.max(frameMetrics.widthUnits, 1),
               outerUsableHeight / Math.max(frameMetrics.heightUnits, 1)
@@ -1119,6 +1126,7 @@
         imagePreviewEl.style.display = showScreenshot ? '' : 'none';
         noteTitleEl.style.display = showNote ? '' : 'none';
         notePreviewEl.style.display = showNote ? '' : 'none';
+        noteTitleEl.classList.toggle('note-title', showScreenshot && showNote);
 
         imagePreviewEl.innerHTML = '';
         imagePreviewEl.className = 'preview-screen';
@@ -1145,7 +1153,7 @@
       }
 
       function getBasePanelHelperText(columns, config) {
-        if (getTextDisplaySettings(config).fixedFontSize) {
+        if (getTextPreviewSettings(config).useSharedPreviewSize) {
           return '';
         }
 
@@ -1477,6 +1485,7 @@
       function renderCurrentView() {
         const baseResponse = latestServerResponse;
         if (!baseResponse || !internalSelection) {
+          previewControlCardEl.style.display = getVisibleSections(currentConfig).previewCell !== false ? '' : 'none';
           selectionChipEl.textContent = formatSelectionChip(internalSelection);
           return;
         }
@@ -1490,6 +1499,7 @@
           setStatus(error.message || 'Missing preview config.', true);
           return;
         }
+        previewControlCardEl.style.display = getVisibleSections(config).previewCell !== false ? '' : 'none';
         renderImageSection(columns, config);
         renderTextSections(columns, config);
       }
@@ -1505,11 +1515,13 @@
         }
 
         ensureSlotViews();
+        previewControlCardEl.style.display = visibleSections.previewCell !== false ? '' : 'none';
         contextCardEl.style.display = (visibleSections.screenshot !== false || visibleSections.note !== false) ? '' : 'none';
         screenshotTitleEl.style.display = visibleSections.screenshot !== false ? '' : 'none';
         imagePreviewEl.innerHTML = '<div class="preview-empty">No Image</div>';
         imagePreviewEl.style.display = visibleSections.screenshot !== false ? '' : 'none';
         noteTitleEl.style.display = visibleSections.note !== false ? '' : 'none';
+        noteTitleEl.classList.toggle('note-title', visibleSections.screenshot !== false && visibleSections.note !== false);
         notePreviewEl.style.display = visibleSections.note !== false ? '' : 'none';
         notePreviewEl.textContent = '';
         slotViews.forEach((view) => {
@@ -1709,16 +1721,17 @@
       function openSettingsModal() {
         const options = getProjectOptions(currentConfig);
         const visibleSections = options.visibleSections || {};
-        const textDisplay = options.textDisplay || {};
+        const textPreview = options.textPreview || {};
         const languageSettings = options.languageSettings || {};
         const fixedStrings = options.fixedStrings || {};
 
+        optShowPreviewCellEl.checked = visibleSections.previewCell !== false;
         optShowScreenshotEl.checked = visibleSections.screenshot !== false;
         optShowNoteEl.checked = visibleSections.note !== false;
         optShowBaseLanguageEl.checked = visibleSections.baseLanguage !== false;
         optShowLocalizationEl.checked = visibleSections.localization !== false;
-        optDefaultFontSizeEl.value = Number(textDisplay.defaultFontSizePx) || 20;
-        optFixedFontSizeEl.checked = Boolean(textDisplay.fixedFontSize);
+        optSharedPreviewSizeEl.value = Number(textPreview.sharedPreviewSizePx) || 20;
+        optUseSharedPreviewSizeEl.checked = Boolean(textPreview.useSharedPreviewSize);
         optDefaultLanguageEl.value = languageSettings.defaultLanguage || '';
         optReservedColumnsEl.textContent = (currentConfig.projectReservedHeaderNames || []).join('\n');
         optIgnoredColumnsEl.value = (languageSettings.ignoredColumns || []).join('\n');
@@ -1737,14 +1750,15 @@
       function collectProjectOptionsFromForm() {
         return {
           visibleSections: {
+            previewCell: optShowPreviewCellEl.checked,
             screenshot: optShowScreenshotEl.checked,
             note: optShowNoteEl.checked,
             baseLanguage: optShowBaseLanguageEl.checked,
             localization: optShowLocalizationEl.checked,
           },
-          textDisplay: {
-            defaultFontSizePx: Number(optDefaultFontSizeEl.value) || 20,
-            fixedFontSize: optFixedFontSizeEl.checked,
+          textPreview: {
+            sharedPreviewSizePx: Number(optSharedPreviewSizeEl.value) || 20,
+            useSharedPreviewSize: optUseSharedPreviewSizeEl.checked,
           },
           languageSettings: {
             defaultLanguage: optDefaultLanguageEl.value,
