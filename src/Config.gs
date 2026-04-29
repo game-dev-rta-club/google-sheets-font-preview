@@ -4,7 +4,7 @@ var FONT_PREVIEW_CONFIG = {
     menuItemName: 'Font Preview',
     sidebarTitle: 'Localization Preview',
   },
-  rowWindowRadius: 50,
+  rowWindowRadius: 10,
   cacheRetentionRadius: 50,
   projectOptions: {
     visibleSections: {

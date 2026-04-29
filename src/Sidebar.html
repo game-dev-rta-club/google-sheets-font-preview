@@ -702,6 +702,7 @@
       let actualSelection = null;
       let internalSelection = null;
       let rowCache = {};
+      let columnSchemaBySheet = {};
       let fontAssignments = {};
       let slotStates = [];
       let slotViews = [];
@@ -849,6 +850,8 @@
           return;
         }
 
+        updateColumnSchema(response);
+
         if (response.sheetName && response.row && response.columns) {
           rowCache[cacheKey(response.sheetName, response.row)] = {
             row: response.row,
@@ -909,6 +912,51 @@
         return rowCache[cacheKey(sheetName, row)] || null;
       }
 
+      function updateColumnSchema(response) {
+        if (!response || !response.sheetName) {
+          return;
+        }
+
+        const schemaMap = {};
+        const registerColumns = (columns, row) => {
+          (columns || []).forEach((column) => {
+            if (!column || !column.key) {
+              return;
+            }
+
+            schemaMap[column.key] = {
+              key: column.key,
+              label: column.label,
+              columnIndex: column.columnIndex,
+              a1Notation: buildA1Notation(row || 1, column.columnIndex),
+            };
+          });
+        };
+
+        const existingSchema = columnSchemaBySheet[response.sheetName] || [];
+        registerColumns(existingSchema, 1);
+        registerColumns(response.columns, response.row);
+        (response.rowWindow || []).forEach((rowState) => registerColumns(rowState.columns, rowState.row));
+
+        columnSchemaBySheet[response.sheetName] = Object.values(schemaMap).sort((left, right) => left.columnIndex - right.columnIndex);
+      }
+
+      function buildFallbackColumns(sheetName, row) {
+        const schema = columnSchemaBySheet[sheetName] || [];
+        return schema.map((column) => ({
+          key: column.key,
+          label: column.label,
+          columnIndex: column.columnIndex,
+          a1Notation: buildA1Notation(row, column.columnIndex),
+          hasImage: false,
+          imageUrl: '',
+          text: '',
+          hasText: false,
+          formula: '',
+          isLoading: true,
+        }));
+      }
+
       function getFontStateForKey(columnKey) {
         return columnKey && fontAssignments[columnKey] ? fontAssignments[columnKey] : null;
       }
@@ -931,7 +979,7 @@
           return latestServerResponse.columns || [];
         }
 
-        return [];
+        return buildFallbackColumns(internalSelection.sheetName, internalSelection.row);
       }
 
       function findColumnByKey(columns, key) {
@@ -1163,6 +1211,11 @@
           img.src = screenshotColumn.imageUrl;
           img.alt = screenshotColumn.label;
           imagePreviewEl.appendChild(img);
+        } else if (showScreenshot && screenshotColumn && screenshotColumn.isLoading) {
+          const empty = document.createElement('div');
+          empty.className = 'preview-empty';
+          empty.textContent = 'Loading...';
+          imagePreviewEl.appendChild(empty);
         } else if (showScreenshot) {
           const empty = document.createElement('div');
           empty.className = screenshotColumn ? 'preview-empty' : 'preview-empty placeholder';
@@ -1175,7 +1228,9 @@
 
         if (showNote) {
           notePreviewEl.className = noteColumn ? 'preview-note' : 'preview-note placeholder';
-          notePreviewEl.textContent = noteColumn ? (noteColumn.text || 'ー') : 'Add a "note" column to show notes.';
+          notePreviewEl.textContent = noteColumn
+            ? (noteColumn.isLoading ? 'Loading...' : (noteColumn.text || 'ー'))
+            : 'Add a "note" column to show notes.';
         }
       }
 
