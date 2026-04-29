@@ -697,6 +697,8 @@
 
       let nextRequestId = 0;
       let latestAcceptedRequestId = 0;
+      let nextActualSelectionRequestId = 0;
+      let latestActualSelectionRequestId = 0;
       let latestServerResponse = null;
       let lastServerSignature = '';
       let actualSelection = null;
@@ -1784,16 +1786,25 @@
         refreshSelection();
       }
 
-      function refreshSelection() {
+      function requestPreviewState(previewRequest) {
+        if (!previewRequest) {
+          return;
+        }
+
         const requestId = ++nextRequestId;
-        const previewRequest = buildPreviewPollRequest();
 
         google.script.run
-          .withSuccessHandler((bundle) => {
-            const actualResponse = bundle && bundle.actualState;
-            const previewResponse = bundle && bundle.previewState;
+          .withSuccessHandler((previewResponse) => {
             if (!previewResponse || !previewResponse.ok) {
-              setStatus(previewResponse && previewResponse.message ? previewResponse.message : 'Failed to load selected row.', true);
+              setStatus(previewResponse && previewResponse.message ? previewResponse.message : 'Failed to load preview row.', true);
+              return;
+            }
+
+            mergeRowCache(previewResponse);
+
+            const responseSelection = selectionFromResponse(previewResponse);
+            const currentInternalFingerprint = selectionFingerprint(internalSelection);
+            if (selectionFingerprint(responseSelection) !== currentInternalFingerprint) {
               return;
             }
 
@@ -1811,21 +1822,9 @@
 
             latestAcceptedRequestId = requestId;
             latestServerResponse = previewResponse;
-            if (actualResponse && actualResponse.ok) {
-              mergeRowCache(actualResponse);
-            }
-            mergeRowCache(previewResponse);
-
-            const actualNext = selectionFromResponse(actualResponse);
-            const actualChanged = selectionFingerprint(actualSelection) !== selectionFingerprint(actualNext);
-            actualSelection = actualNext;
-
-            if (actualChanged || !internalSelection) {
-              internalSelection = { ...actualSelection };
-            }
 
             const nextSignature = buildServerSignature(previewResponse);
-            if (nextSignature !== lastServerSignature || actualChanged) {
+            if (nextSignature !== lastServerSignature) {
               lastServerSignature = nextSignature;
               renderCurrentView();
             }
@@ -1833,9 +1832,50 @@
             setStatus('');
           })
           .withFailureHandler((error) => {
+            setStatus(error && error.message ? error.message : 'Failed to load preview row.', true);
+          })
+          .getPreviewStateForPosition(previewRequest);
+      }
+
+      function refreshSelection() {
+        const requestId = ++nextActualSelectionRequestId;
+
+        google.script.run
+          .withSuccessHandler((actualResponse) => {
+            if (!actualResponse || !actualResponse.ok) {
+              setStatus(actualResponse && actualResponse.message ? actualResponse.message : 'Failed to load selected row.', true);
+              return;
+            }
+
+            if (requestId < latestActualSelectionRequestId) {
+              return;
+            }
+
+            if (selectionCommitInFlight) {
+              return;
+            }
+
+            latestActualSelectionRequestId = requestId;
+
+            const actualNext = selectionFromResponse(actualResponse);
+            const actualChanged = selectionFingerprint(actualSelection) !== selectionFingerprint(actualNext);
+            actualSelection = actualNext;
+
+            if (actualChanged || !internalSelection) {
+              internalSelection = { ...actualSelection };
+              renderCurrentView();
+              requestPreviewState(buildPreviewPollRequest());
+            }
+            else {
+              requestPreviewState(buildPreviewPollRequest());
+            }
+
+            setStatus('');
+          })
+          .withFailureHandler((error) => {
             setStatus(error && error.message ? error.message : 'Failed to load selected row.', true);
           })
-          .getPreviewStateBundle(previewRequest);
+          .getActualSelectionState();
       }
 
       function requestInternalSelectionRow(row) {

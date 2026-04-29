@@ -192,18 +192,34 @@ function getPreviewState() {
   return state;
 }
 
-function getPreviewStateBundle(request) {
-  var actualState = readActiveRangeState_();
-  var previewState = actualState;
-
-  if (request) {
-    previewState = getPreviewStateForPosition(request);
+function getActualSelectionState() {
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  if (!spreadsheet) {
+    return { ok: false, message: 'No active spreadsheet.' };
   }
 
+  var sheet = spreadsheet.getActiveSheet();
+  var range = sheet ? sheet.getActiveRange() : null;
+  if (!sheet || !range) {
+    return { ok: false, message: 'No active cell.' };
+  }
+
+  var row = range.getRow();
+  var column = range.getColumn();
+  var headerValues = getHeaderValues_(sheet);
+  var now = new Date();
+
   return {
-    ok: Boolean(previewState && previewState.ok),
-    actualState: actualState,
-    previewState: previewState,
+    ok: true,
+    spreadsheetName: spreadsheet.getName(),
+    sheetName: sheet.getName(),
+    a1Notation: buildA1Notation_(row, column),
+    row: row,
+    column: column,
+    selectedHeaderKey: createHeaderKey_(column, headerValues[column - 1] || ''),
+    triggerSource: 'actualSelection',
+    serverSavedAtMs: now.getTime(),
+    serverSavedAtIso: now.toISOString(),
   };
 }
 
