@@ -1067,6 +1067,23 @@
         );
       }
 
+      function createRowColumnContext(columns, selection) {
+        return {
+          columns: columns || [],
+          sheetName: selection && selection.sheetName ? selection.sheetName : '',
+          row: selection && selection.row ? selection.row : 1,
+        };
+      }
+
+      function resolveContextColumnByNormalizedLabel(rowContext, normalizedLabel) {
+        return resolveColumnByNormalizedLabel(
+          rowContext.columns,
+          rowContext.sheetName,
+          rowContext.row,
+          normalizedLabel
+        );
+      }
+
       function getFontStateForKey(columnKey) {
         return columnKey && fontAssignments[columnKey] ? fontAssignments[columnKey] : null;
       }
@@ -1194,23 +1211,17 @@
         );
       }
 
-      function getTextFrameMetrics(columns, config) {
+      function getTextFrameMetrics(rowContext, config) {
         if (getTextPreviewSettings(config).useSharedPreviewSize) {
           return getDefaultTextFrameMetrics(config);
         }
 
-        const targetSheetName = internalSelection ? internalSelection.sheetName : '';
-        const targetRow = internalSelection ? internalSelection.row : 1;
-        const widthColumn = resolveColumnByNormalizedLabel(
-          columns,
-          targetSheetName,
-          targetRow,
+        const widthColumn = resolveContextColumnByNormalizedLabel(
+          rowContext,
           normalizeLabel(config.widthHeaderName)
         );
-        const heightColumn = resolveColumnByNormalizedLabel(
-          columns,
-          targetSheetName,
-          targetRow,
+        const heightColumn = resolveContextColumnByNormalizedLabel(
+          rowContext,
           normalizeLabel(config.heightHeaderName)
         );
         const defaultMetrics = getDefaultTextFrameMetrics(config);
@@ -1317,18 +1328,13 @@
 
       function renderImageSection(columns, config) {
         const visibleSections = getVisibleSections(config);
-        const targetSheetName = internalSelection ? internalSelection.sheetName : '';
-        const targetRow = internalSelection ? internalSelection.row : 1;
-        const screenshotColumn = resolveColumnByNormalizedLabel(
-          columns,
-          targetSheetName,
-          targetRow,
+        const rowContext = createRowColumnContext(columns, internalSelection);
+        const screenshotColumn = resolveContextColumnByNormalizedLabel(
+          rowContext,
           normalizeLabel(config.screenshotHeaderName)
         );
-        const noteColumn = resolveColumnByNormalizedLabel(
-          columns,
-          targetSheetName,
-          targetRow,
+        const noteColumn = resolveContextColumnByNormalizedLabel(
+          rowContext,
           normalizeLabel(config.noteHeaderName)
         );
         const showScreenshot = visibleSections.screenshot !== false;
@@ -1377,18 +1383,13 @@
           return '';
         }
 
-        const targetSheetName = internalSelection ? internalSelection.sheetName : '';
-        const targetRow = internalSelection ? internalSelection.row : 1;
-        const widthColumn = resolveColumnByNormalizedLabel(
-          columns,
-          targetSheetName,
-          targetRow,
+        const rowContext = createRowColumnContext(columns, internalSelection);
+        const widthColumn = resolveContextColumnByNormalizedLabel(
+          rowContext,
           normalizeLabel(config.widthHeaderName)
         );
-        const heightColumn = resolveColumnByNormalizedLabel(
-          columns,
-          targetSheetName,
-          targetRow,
+        const heightColumn = resolveContextColumnByNormalizedLabel(
+          rowContext,
           normalizeLabel(config.heightHeaderName)
         );
 
@@ -1690,9 +1691,10 @@
               : buildFallbackColumns(effectiveTarget.sheetName, effectiveTarget.row)
             ))
             : columns;
+          const rowContext = createRowColumnContext(viewColumns, effectiveTarget || internalSelection);
           const targetColumn = effectiveTarget ? findColumnByKey(viewColumns, effectiveTarget.headerKey) : null;
           const fontState = getFontStateForKey(effectiveTarget ? effectiveTarget.headerKey : '');
-          const frameMetrics = getTextFrameMetrics(viewColumns, config);
+          const frameMetrics = getTextFrameMetrics(rowContext, config);
           const nextValue = getSlotDisplayValue(slotState, targetColumn);
           const isFocused = document.activeElement === view.preview;
           const isLoadingTarget = Boolean(targetColumn && targetColumn.isLoading);
