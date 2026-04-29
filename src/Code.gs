@@ -756,8 +756,13 @@ function readCellPreviewValues_(value, richText, displayValue, formula) {
     imageUrl = getImageUrlFromFormula_(formula);
   }
 
-  var text = richText ? richText.getText() : displayValue;
-  text = text || '';
+  var richTextValue = richText && typeof richText.getText === 'function'
+    ? richText.getText()
+    : '';
+  var text = String(richTextValue || '');
+  if (!text && displayValue !== null && displayValue !== undefined) {
+    text = String(displayValue);
+  }
 
   return {
     hasImage: Boolean(imageUrl),
