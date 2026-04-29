@@ -957,6 +957,41 @@
         }));
       }
 
+      function findSchemaColumnByNormalizedLabel(sheetName, normalizedLabel) {
+        return (columnSchemaBySheet[sheetName] || []).find((column) => normalizeLabel(column.label) === normalizedLabel) || null;
+      }
+
+      function createLoadingColumnFromSchema(schemaColumn, row) {
+        if (!schemaColumn) {
+          return null;
+        }
+
+        return {
+          key: schemaColumn.key,
+          label: schemaColumn.label,
+          columnIndex: schemaColumn.columnIndex,
+          a1Notation: buildA1Notation(row, schemaColumn.columnIndex),
+          hasImage: false,
+          imageUrl: '',
+          text: '',
+          hasText: false,
+          formula: '',
+          isLoading: true,
+        };
+      }
+
+      function resolveColumnByNormalizedLabel(columns, sheetName, row, normalizedLabel) {
+        const loadedColumn = findColumnByNormalizedLabel(columns, normalizedLabel);
+        if (loadedColumn) {
+          return loadedColumn;
+        }
+
+        return createLoadingColumnFromSchema(
+          findSchemaColumnByNormalizedLabel(sheetName, normalizedLabel),
+          row
+        );
+      }
+
       function getFontStateForKey(columnKey) {
         return columnKey && fontAssignments[columnKey] ? fontAssignments[columnKey] : null;
       }
@@ -1089,8 +1124,20 @@
           return getDefaultTextFrameMetrics(config);
         }
 
-        const widthColumn = findColumnByNormalizedLabel(columns, normalizeLabel(config.widthHeaderName));
-        const heightColumn = findColumnByNormalizedLabel(columns, normalizeLabel(config.heightHeaderName));
+        const targetSheetName = internalSelection ? internalSelection.sheetName : '';
+        const targetRow = internalSelection ? internalSelection.row : 1;
+        const widthColumn = resolveColumnByNormalizedLabel(
+          columns,
+          targetSheetName,
+          targetRow,
+          normalizeLabel(config.widthHeaderName)
+        );
+        const heightColumn = resolveColumnByNormalizedLabel(
+          columns,
+          targetSheetName,
+          targetRow,
+          normalizeLabel(config.heightHeaderName)
+        );
         const defaultMetrics = getDefaultTextFrameMetrics(config);
         const defaultWidthUnits = defaultMetrics.widthUnits - config.textFrameSizePaddingUnits;
         const defaultHeightUnits = defaultMetrics.heightUnits - config.textFrameSizePaddingUnits;
@@ -1191,8 +1238,20 @@
 
       function renderImageSection(columns, config) {
         const visibleSections = getVisibleSections(config);
-        const screenshotColumn = findColumnByNormalizedLabel(columns, normalizeLabel(config.screenshotHeaderName));
-        const noteColumn = findColumnByNormalizedLabel(columns, normalizeLabel(config.noteHeaderName));
+        const targetSheetName = internalSelection ? internalSelection.sheetName : '';
+        const targetRow = internalSelection ? internalSelection.row : 1;
+        const screenshotColumn = resolveColumnByNormalizedLabel(
+          columns,
+          targetSheetName,
+          targetRow,
+          normalizeLabel(config.screenshotHeaderName)
+        );
+        const noteColumn = resolveColumnByNormalizedLabel(
+          columns,
+          targetSheetName,
+          targetRow,
+          normalizeLabel(config.noteHeaderName)
+        );
         const showScreenshot = visibleSections.screenshot !== false;
         const showNote = visibleSections.note !== false;
 
@@ -1239,8 +1298,24 @@
           return '';
         }
 
-        const widthColumn = findColumnByNormalizedLabel(columns, normalizeLabel(config.widthHeaderName));
-        const heightColumn = findColumnByNormalizedLabel(columns, normalizeLabel(config.heightHeaderName));
+        const targetSheetName = internalSelection ? internalSelection.sheetName : '';
+        const targetRow = internalSelection ? internalSelection.row : 1;
+        const widthColumn = resolveColumnByNormalizedLabel(
+          columns,
+          targetSheetName,
+          targetRow,
+          normalizeLabel(config.widthHeaderName)
+        );
+        const heightColumn = resolveColumnByNormalizedLabel(
+          columns,
+          targetSheetName,
+          targetRow,
+          normalizeLabel(config.heightHeaderName)
+        );
+
+        if ((widthColumn && widthColumn.isLoading) || (heightColumn && heightColumn.isLoading)) {
+          return '';
+        }
 
         const messages = [];
         if (!widthColumn) {
@@ -1248,10 +1323,6 @@
         }
         if (!heightColumn) {
           messages.push(`Add a "${config.heightHeaderName}" column to match the real height.`);
-        }
-
-        if ((widthColumn && widthColumn.isLoading) || (heightColumn && heightColumn.isLoading)) {
-          return '';
         }
 
         return messages.join('\n');
