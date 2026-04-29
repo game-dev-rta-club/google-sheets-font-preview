@@ -1622,6 +1622,7 @@
           const frameMetrics = getTextFrameMetrics(viewColumns, config);
           const nextValue = getSlotDisplayValue(slotState, targetColumn);
           const isFocused = document.activeElement === view.preview;
+          const isLoadingTarget = Boolean(targetColumn && targetColumn.isLoading);
 
           if (view.columnSelect) {
             const selectableColumns = getSelectableLocalizationColumns(viewColumns, config);
@@ -1633,14 +1634,14 @@
               option.selected = Boolean(effectiveTarget && column.key === effectiveTarget.headerKey);
               view.columnSelect.appendChild(option);
             });
-            view.columnSelect.disabled = selectableColumns.length === 0;
+            view.columnSelect.disabled = selectableColumns.length === 0 || isLoadingTarget;
             view.columnSelectWrap.style.display = '';
           }
 
-          view.dropzone.className = `dropzone${slotState.fontEditable ? '' : ' disabled'}`;
-          view.dropzone.tabIndex = slotState.fontEditable ? 0 : -1;
-          view.fileInput.disabled = !slotState.fontEditable;
-          view.preview.disabled = !slotState.editable;
+          view.dropzone.className = `dropzone${slotState.fontEditable && !isLoadingTarget ? '' : ' disabled'}`;
+          view.dropzone.tabIndex = slotState.fontEditable && !isLoadingTarget ? 0 : -1;
+          view.fileInput.disabled = !slotState.fontEditable || isLoadingTarget;
+          view.preview.disabled = !slotState.editable || isLoadingTarget;
           view.preview.dataset.targetFingerprint = effectiveFingerprint || '';
 
           if (fontState && fontState.fontFamily) {
