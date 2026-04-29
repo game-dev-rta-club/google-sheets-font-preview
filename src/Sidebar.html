@@ -313,7 +313,7 @@
       .control-panel {
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        align-items: flex-end;
         gap: 8px;
       }
 
@@ -323,10 +323,24 @@
         gap: 8px;
       }
 
+      .control-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 6px;
+      }
+
+      .control-nav-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
       .settings-button {
-        min-width: 44px;
-        padding: 8px 10px;
-        font-size: 18px;
+        min-width: 52px;
+        min-height: 44px;
+        padding: 4px 8px;
+        font-size: 32px;
         line-height: 1;
       }
 
@@ -430,6 +444,10 @@
         gap: 8px;
       }
 
+      .settings-grid.single-column {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
       .settings-grid.two-columns {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
@@ -438,6 +456,13 @@
         display: flex;
         align-items: flex-start;
         gap: 8px;
+        padding: 8px 0;
+        border-top: 1px solid #ece4d8;
+      }
+
+      .checkbox-row:first-child {
+        border-top: 0;
+        padding-top: 0;
       }
 
       .checkbox-row input {
@@ -452,6 +477,13 @@
       .field-row {
         display: grid;
         gap: 4px;
+        padding: 8px 0;
+        border-top: 1px solid #ece4d8;
+      }
+
+      .field-row:first-child {
+        border-top: 0;
+        padding-top: 0;
       }
 
       .field-row label {
@@ -512,9 +544,11 @@
               <button id="selectButton" class="selection-action" type="button">Select</button>
             </div>
           </div>
-          <div class="control-group">
-            <button id="moveUpButton" class="nav-button" type="button">▲</button>
-            <button id="moveDownButton" class="nav-button" type="button">▼</button>
+          <div class="control-actions">
+            <div class="control-nav-row">
+              <button id="moveUpButton" class="nav-button" type="button">▲</button>
+              <button id="moveDownButton" class="nav-button" type="button">▼</button>
+            </div>
             <button id="settingsButton" class="settings-button" type="button" aria-label="Open options">⚙</button>
           </div>
         </div>
@@ -525,12 +559,12 @@
 
     <div id="settingsModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
       <div class="modal-panel">
-        <h2 id="settingsTitle" class="modal-title">Project Options</h2>
+        <h2 id="settingsTitle" class="modal-title">Options</h2>
 
         <section class="modal-section">
           <h3>Visible Panels</h3>
           <p class="modal-copy">Choose which parts of the sidebar should be visible for everyone using this spreadsheet.</p>
-          <div class="settings-grid two-columns">
+          <div class="settings-grid single-column">
             <div class="checkbox-row"><input id="optShowScreenshot" type="checkbox"><label for="optShowScreenshot"><strong>SCREENSHOT</strong><br>Show the screenshot preview area.</label></div>
             <div class="checkbox-row"><input id="optShowNote" type="checkbox"><label for="optShowNote"><strong>NOTE</strong><br>Show the note area below the screenshot.</label></div>
             <div class="checkbox-row"><input id="optShowBaseLanguage" type="checkbox"><label for="optShowBaseLanguage"><strong>BASE LANGUAGE</strong><br>Show the base language preview panel.</label></div>
@@ -539,7 +573,7 @@
         </section>
 
         <section class="modal-section">
-          <h3>Text Display</h3>
+          <h3>Text Preview</h3>
           <p class="modal-copy">Control the default preview font size and whether the preview should stop resizing when width and height columns are missing.</p>
           <div class="settings-grid">
             <div class="field-row">
@@ -575,7 +609,7 @@
         <section class="modal-section">
           <h3>Fixed Header Names</h3>
           <p class="modal-copy">Change the header names that the sidebar treats as fixed-purpose columns.</p>
-          <div class="settings-grid two-columns">
+          <div class="settings-grid single-column">
             <div class="field-row">
               <label for="optHeaderScreenshot">SCREENSHOT</label>
               <input id="optHeaderScreenshot" type="text">
