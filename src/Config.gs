@@ -14,7 +14,8 @@ var FONT_PREVIEW_CONFIG = {
       localization: true,
     },
     textPreview: {
-      sharedPreviewSizePx: 20,
+      defaultWidthUnits: 20,
+      defaultHeightUnits: 4,
       useSharedPreviewSize: false,
     },
     languageSettings: {

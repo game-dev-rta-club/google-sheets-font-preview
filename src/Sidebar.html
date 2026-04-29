@@ -589,15 +589,19 @@
 
         <section class="modal-section">
           <h3>Text Preview</h3>
-          <p class="modal-copy">Control the shared preview size and whether every text should use the same preview size instead of reading width and height columns.</p>
+          <p class="modal-copy">Control the default text area size used when width and height columns are missing, and optionally use that same size for every text.</p>
           <div class="settings-grid">
             <div class="field-row">
-              <label for="optSharedPreviewSize">Default preview size (px)</label>
-              <input id="optSharedPreviewSize" type="number" min="8" step="1">
+              <label for="optDefaultPreviewWidth">Default width (characters)</label>
+              <input id="optDefaultPreviewWidth" type="number" min="1" step="0.25">
+            </div>
+            <div class="field-row">
+              <label for="optDefaultPreviewHeight">Default height (lines)</label>
+              <input id="optDefaultPreviewHeight" type="number" min="1" step="0.25">
             </div>
             <div class="checkbox-row">
               <input id="optUseSharedPreviewSize" type="checkbox">
-              <label for="optUseSharedPreviewSize"><strong>Use the same preview size for all texts</strong><br>Ignore width and height columns and display every text with the same preview size.</label>
+              <label for="optUseSharedPreviewSize"><strong>Use the default text area size for all texts</strong><br>Ignore width and height columns and display every text with the default width and height set above.</label>
             </div>
           </div>
         </section>
@@ -675,7 +679,8 @@
       const optShowNoteEl = document.getElementById('optShowNote');
       const optShowBaseLanguageEl = document.getElementById('optShowBaseLanguage');
       const optShowLocalizationEl = document.getElementById('optShowLocalization');
-      const optSharedPreviewSizeEl = document.getElementById('optSharedPreviewSize');
+      const optDefaultPreviewWidthEl = document.getElementById('optDefaultPreviewWidth');
+      const optDefaultPreviewHeightEl = document.getElementById('optDefaultPreviewHeight');
       const optUseSharedPreviewSizeEl = document.getElementById('optUseSharedPreviewSize');
       const optDefaultLanguageEl = document.getElementById('optDefaultLanguage');
       const optReservedColumnsEl = document.getElementById('optReservedColumns');
@@ -1009,9 +1014,12 @@
 
       function getDefaultTextFrameMetrics(config) {
         const effectiveConfig = config || BOOTSTRAP_CONFIG;
+        const textPreview = getTextPreviewSettings(effectiveConfig);
+        const baseWidthUnits = Math.max(1, Number(textPreview.defaultWidthUnits) || effectiveConfig.textFrameBaseWidthUnits);
+        const baseHeightUnits = Math.max(1, Number(textPreview.defaultHeightUnits) || effectiveConfig.textFrameBaseHeightUnits);
         return createTextFrameMetrics(
-          effectiveConfig.textFrameBaseWidthUnits + effectiveConfig.textFrameSizePaddingUnits,
-          effectiveConfig.textFrameBaseHeightUnits + effectiveConfig.textFrameSizePaddingUnits
+          baseWidthUnits + effectiveConfig.textFrameSizePaddingUnits,
+          baseHeightUnits + effectiveConfig.textFrameSizePaddingUnits
         );
       }
 
@@ -1022,8 +1030,11 @@
 
         const widthColumn = findColumnByNormalizedLabel(columns, normalizeLabel(config.widthHeaderName));
         const heightColumn = findColumnByNormalizedLabel(columns, normalizeLabel(config.heightHeaderName));
-        const widthUnits = (parsePositiveNumber(widthColumn ? widthColumn.text : '') || config.textFrameBaseWidthUnits) + config.textFrameSizePaddingUnits;
-        const heightUnits = (parsePositiveNumber(heightColumn ? heightColumn.text : '') || config.textFrameBaseHeightUnits) + config.textFrameSizePaddingUnits;
+        const defaultMetrics = getDefaultTextFrameMetrics(config);
+        const defaultWidthUnits = defaultMetrics.widthUnits - config.textFrameSizePaddingUnits;
+        const defaultHeightUnits = defaultMetrics.heightUnits - config.textFrameSizePaddingUnits;
+        const widthUnits = (parsePositiveNumber(widthColumn ? widthColumn.text : '') || defaultWidthUnits) + config.textFrameSizePaddingUnits;
+        const heightUnits = (parsePositiveNumber(heightColumn ? heightColumn.text : '') || defaultHeightUnits) + config.textFrameSizePaddingUnits;
         return createTextFrameMetrics(widthUnits, heightUnits);
       }
 
@@ -1031,13 +1042,10 @@
         const outerUsableWidth = Math.max(20, frameOuter.clientWidth);
         const outerUsableHeight = Math.max(16, frameOuter.clientHeight);
         const reservedScrollbarWidth = getScrollbarWidthPx();
-        const textPreview = getTextPreviewSettings(currentConfig);
-        const fontSize = textPreview.useSharedPreviewSize
-          ? Math.max(8, Number(textPreview.sharedPreviewSizePx) || 20)
-          : Math.max(8, Math.min(
-              (outerUsableWidth - reservedScrollbarWidth) / Math.max(frameMetrics.widthUnits, 1),
-              outerUsableHeight / Math.max(frameMetrics.heightUnits, 1)
-            ));
+        const fontSize = Math.max(8, Math.min(
+          (outerUsableWidth - reservedScrollbarWidth) / Math.max(frameMetrics.widthUnits, 1),
+          outerUsableHeight / Math.max(frameMetrics.heightUnits, 1)
+        ));
 
         return {
           fontSize,
@@ -1736,7 +1744,8 @@
         optShowNoteEl.checked = visibleSections.note !== false;
         optShowBaseLanguageEl.checked = visibleSections.baseLanguage !== false;
         optShowLocalizationEl.checked = visibleSections.localization !== false;
-        optSharedPreviewSizeEl.value = Number(textPreview.sharedPreviewSizePx) || 20;
+        optDefaultPreviewWidthEl.value = Number(textPreview.defaultWidthUnits) || 20;
+        optDefaultPreviewHeightEl.value = Number(textPreview.defaultHeightUnits) || 4;
         optUseSharedPreviewSizeEl.checked = Boolean(textPreview.useSharedPreviewSize);
         optDefaultLanguageEl.value = languageSettings.defaultLanguage || '';
         optReservedColumnsEl.textContent = (currentConfig.projectReservedHeaderNames || []).join('\n');
@@ -1763,7 +1772,8 @@
             localization: optShowLocalizationEl.checked,
           },
           textPreview: {
-            sharedPreviewSizePx: Number(optSharedPreviewSizeEl.value) || 20,
+            defaultWidthUnits: Number(optDefaultPreviewWidthEl.value) || 20,
+            defaultHeightUnits: Number(optDefaultPreviewHeightEl.value) || 4,
             useSharedPreviewSize: optUseSharedPreviewSizeEl.checked,
           },
           languageSettings: {

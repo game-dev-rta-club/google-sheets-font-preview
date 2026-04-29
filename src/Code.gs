@@ -46,9 +46,13 @@ function sanitizeProjectOptions_(rawOptions) {
       localization: visibleSections.localization !== false,
     },
     textPreview: {
-      sharedPreviewSizePx: Math.max(
-        8,
-        Number(textPreview.sharedPreviewSizePx || textPreview.defaultFontSizePx) || defaults.textPreview.sharedPreviewSizePx
+      defaultWidthUnits: Math.max(
+        1,
+        Number(textPreview.defaultWidthUnits) || defaults.textPreview.defaultWidthUnits
+      ),
+      defaultHeightUnits: Math.max(
+        1,
+        Number(textPreview.defaultHeightUnits) || defaults.textPreview.defaultHeightUnits
       ),
       useSharedPreviewSize: Boolean(
         textPreview.useSharedPreviewSize !== undefined
@@ -135,7 +139,8 @@ function createClientPreviewConfig_() {
     projectReservedHeaderNames: reservedHeaderNames,
     userIgnoredColumns: options.languageSettings.ignoredColumns,
     visibleSections: options.visibleSections,
-    sharedPreviewSizePx: options.textPreview.sharedPreviewSizePx,
+    defaultWidthUnits: options.textPreview.defaultWidthUnits,
+    defaultHeightUnits: options.textPreview.defaultHeightUnits,
     useSharedPreviewSize: options.textPreview.useSharedPreviewSize,
     pollIntervalMs: config.timing.pollIntervalMs,
     saveDebounceMs: config.timing.saveDebounceMs,
