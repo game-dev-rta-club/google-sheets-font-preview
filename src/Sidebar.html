@@ -1700,12 +1700,13 @@
         previewControlCardEl.style.display = visibleSections.previewCell !== false ? '' : 'none';
         contextCardEl.style.display = (visibleSections.screenshot !== false || visibleSections.note !== false) ? '' : 'none';
         screenshotTitleEl.style.display = visibleSections.screenshot !== false ? '' : 'none';
-        imagePreviewEl.innerHTML = '<div class="preview-empty">No Image</div>';
+        imagePreviewEl.innerHTML = '<div class="preview-empty">Loading...</div>';
         imagePreviewEl.style.display = visibleSections.screenshot !== false ? '' : 'none';
         noteTitleEl.style.display = visibleSections.note !== false ? '' : 'none';
         noteTitleEl.classList.toggle('note-title', visibleSections.screenshot !== false && visibleSections.note !== false);
         notePreviewEl.style.display = visibleSections.note !== false ? '' : 'none';
-        notePreviewEl.textContent = '';
+        notePreviewEl.className = 'preview-note';
+        notePreviewEl.textContent = 'Loading...';
         slotViews.forEach((view) => {
           const shouldShow = slotViews.indexOf(view) === 0 ? visibleSections.baseLanguage !== false : visibleSections.localization !== false;
           view.card.style.display = shouldShow ? '' : 'none';
@@ -1720,7 +1721,7 @@
           view.dropzone.tabIndex = -1;
           view.fileInput.disabled = true;
           view.preview.disabled = true;
-          view.preview.value = '';
+          view.preview.value = 'Loading...';
           view.preview.style.fontFamily = '';
           view.helper.textContent = '';
           view.helper.style.display = 'none';
