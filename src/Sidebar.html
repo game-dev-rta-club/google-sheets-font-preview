@@ -760,6 +760,7 @@
       let internalSelection = null;
       let rowCache = {};
       let columnSchemaBySheet = {};
+      let textFrameMetricsCache = {};
       let fontAssignments = {};
       let slotStates = [];
       let slotViews = [];
@@ -985,6 +986,25 @@
 
       function getCachedRow(sheetName, row) {
         return rowCache[cacheKey(sheetName, row)] || null;
+      }
+
+      function textFrameCacheKey(sheetName, row) {
+        return `${sheetName}::${row}`;
+      }
+
+      function getCachedTextFrameMetrics(sheetName, row) {
+        return textFrameMetricsCache[textFrameCacheKey(sheetName, row)] || null;
+      }
+
+      function setCachedTextFrameMetrics(sheetName, row, frameMetrics) {
+        if (!sheetName || !row || !frameMetrics) {
+          return;
+        }
+
+        textFrameMetricsCache[textFrameCacheKey(sheetName, row)] = {
+          widthUnits: frameMetrics.widthUnits,
+          heightUnits: frameMetrics.heightUnits,
+        };
       }
 
       function updateColumnSchema(response) {
@@ -1216,9 +1236,25 @@
         const defaultMetrics = getDefaultTextFrameMetrics(config);
         const defaultWidthUnits = defaultMetrics.widthUnits - config.textFrameSizePaddingUnits;
         const defaultHeightUnits = defaultMetrics.heightUnits - config.textFrameSizePaddingUnits;
+        const widthIsLoading = Boolean(widthColumn && widthColumn.isLoading);
+        const heightIsLoading = Boolean(heightColumn && heightColumn.isLoading);
+
+        if (widthIsLoading || heightIsLoading) {
+          const cachedMetrics = getCachedTextFrameMetrics(targetSheetName, targetRow);
+          if (cachedMetrics) {
+            return cachedMetrics;
+          }
+        }
+
         const widthUnits = (parsePositiveNumber(widthColumn ? widthColumn.text : '') || defaultWidthUnits) + config.textFrameSizePaddingUnits;
         const heightUnits = (parsePositiveNumber(heightColumn ? heightColumn.text : '') || defaultHeightUnits) + config.textFrameSizePaddingUnits;
-        return createTextFrameMetrics(widthUnits, heightUnits);
+        const nextMetrics = createTextFrameMetrics(widthUnits, heightUnits);
+
+        if ((widthColumn && !widthColumn.isLoading) || (heightColumn && !heightColumn.isLoading)) {
+          setCachedTextFrameMetrics(targetSheetName, targetRow, nextMetrics);
+        }
+
+        return nextMetrics;
       }
 
       function calculateTextLayoutMetrics(frameOuter, frameMetrics) {
