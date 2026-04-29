@@ -115,8 +115,7 @@ function saveProjectOptions(options) {
   return createClientPreviewConfig_();
 }
 
-function getReservedHeaderNames_() {
-  var options = getResolvedProjectOptions_();
+function getReservedHeaderNamesFromOptions_(options) {
   return [
     options.fixedStrings.screenshot,
     options.fixedStrings.note,
@@ -128,7 +127,7 @@ function getReservedHeaderNames_() {
 function createClientPreviewConfig_() {
   var config = getFontPreviewConfig_();
   var options = getResolvedProjectOptions_();
-  var reservedHeaderNames = getReservedHeaderNames_();
+  var reservedHeaderNames = getReservedHeaderNamesFromOptions_(options);
   return {
     screenshotHeaderName: options.fixedStrings.screenshot,
     noteHeaderName: options.fixedStrings.note,

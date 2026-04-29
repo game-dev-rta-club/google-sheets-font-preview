@@ -756,6 +756,24 @@
         return getProjectOptions(config).fixedStrings || {};
       }
 
+      function getBuiltInNonLanguageColumnsFromFixedStrings(fixedStrings) {
+        return [
+          fixedStrings.screenshot,
+          fixedStrings.note,
+          fixedStrings.width,
+          fixedStrings.height,
+        ].map((value) => String(value || '').trim()).filter(Boolean);
+      }
+
+      function refreshReservedColumnsPreview() {
+        optReservedColumnsEl.textContent = getBuiltInNonLanguageColumnsFromFixedStrings({
+          screenshot: optHeaderScreenshotEl.value,
+          note: optHeaderNoteEl.value,
+          width: optHeaderWidthEl.value,
+          height: optHeaderHeightEl.value,
+        }).join('\n');
+      }
+
       function normalizeLabel(value) {
         return String(value || '')
           .trim()
@@ -1959,12 +1977,12 @@
         optDefaultPreviewHeightEl.value = Number(textPreview.defaultHeightUnits) || 4;
         optUseSharedPreviewSizeEl.checked = Boolean(textPreview.useSharedPreviewSize);
         optDefaultLanguageEl.value = languageSettings.defaultLanguage || '';
-        optReservedColumnsEl.textContent = (currentConfig.projectReservedHeaderNames || []).join('\n');
         optIgnoredColumnsEl.value = (languageSettings.ignoredColumns || []).join('\n');
         optHeaderScreenshotEl.value = fixedStrings.screenshot || '';
         optHeaderNoteEl.value = fixedStrings.note || '';
         optHeaderWidthEl.value = fixedStrings.width || '';
         optHeaderHeightEl.value = fixedStrings.height || '';
+        refreshReservedColumnsPreview();
 
         settingsModalEl.classList.add('is-open');
       }
@@ -2001,6 +2019,9 @@
       }
 
       settingsButtonEl.addEventListener('click', openSettingsModal);
+      [optHeaderScreenshotEl, optHeaderNoteEl, optHeaderWidthEl, optHeaderHeightEl].forEach((input) => {
+        input.addEventListener('input', refreshReservedColumnsPreview);
+      });
       settingsCancelButtonEl.addEventListener('click', closeSettingsModal);
       settingsModalEl.addEventListener('click', (event) => {
         if (event.target === settingsModalEl) {
