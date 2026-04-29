@@ -708,6 +708,8 @@
       let slotViews = [];
       let selectionCommitInFlight = false;
       let ignorePollResponsesThroughRequestId = 0;
+      let pollRequestInFlight = false;
+      let pollRefreshQueued = false;
       let scrollbarWidthPx = null;
       let preferredBaseColumnKey = '';
 
@@ -1328,7 +1330,7 @@
         return messages.join('\n');
       }
 
-      function queueTextSave(slotIndex) {
+      function queueTextSave(slotIndex, immediate) {
         const slotState = slotStates[slotIndex];
         const effectiveTarget = slotState && (slotState.editLockTarget || slotState.target);
         if (!slotState || !effectiveTarget || !slotState.editable) {
@@ -1343,7 +1345,8 @@
         const draftValue = slotState.draftValue;
         const token = ++slotState.saveToken;
 
-        slotState.debounceTimer = window.setTimeout(() => {
+        const runSave = () => {
+          slotState.debounceTimer = null;
           google.script.run
             .withSuccessHandler((result) => {
               const currentSlotState = slotStates[slotIndex];
@@ -1385,7 +1388,14 @@
               headerKey: target.headerKey,
               value: draftValue,
           });
-        }, saveDebounceMs);
+        };
+
+        if (immediate) {
+          runSave();
+          return;
+        }
+
+        slotState.debounceTimer = window.setTimeout(runSave, saveDebounceMs);
       }
 
       function createSlotView(slotIndex) {
@@ -1548,6 +1558,9 @@
           if (!slotState) {
             return;
           }
+          if (slotState.isDirty && slotState.editable) {
+            queueTextSave(slotIndex, true);
+          }
           slotState.editLockTarget = null;
           slotState.editLockFingerprint = '';
           window.setTimeout(renderCurrentView, 0);
@@ -1563,7 +1576,6 @@
 
           currentSlotState.draftValue = event.target.value;
           currentSlotState.isDirty = true;
-          queueTextSave(index);
         });
 
         textSectionsEl.appendChild(card);
@@ -1746,13 +1758,50 @@
         }
       }
 
+      function buildPreviewPollRequest() {
+        if (!internalSelection) {
+          return null;
+        }
+
+        return {
+          sheetName: internalSelection.sheetName,
+          row: internalSelection.row,
+          column: internalSelection.column,
+        };
+      }
+
+      function requestPollRefresh() {
+        if (pollRequestInFlight) {
+          pollRefreshQueued = true;
+          return;
+        }
+
+        refreshSelection();
+      }
+
+      function finishPollRefresh() {
+        pollRequestInFlight = false;
+        if (!pollRefreshQueued) {
+          return;
+        }
+
+        pollRefreshQueued = false;
+        refreshSelection();
+      }
+
       function refreshSelection() {
         const requestId = ++nextRequestId;
+        pollRequestInFlight = true;
+        const previewRequest = buildPreviewPollRequest();
 
         google.script.run
-          .withSuccessHandler((response) => {
-            if (!response || !response.ok) {
-              setStatus(response && response.message ? response.message : 'Failed to load selected row.', true);
+          .withSuccessHandler((bundle) => {
+            finishPollRefresh();
+
+            const actualResponse = bundle && bundle.actualState;
+            const previewResponse = bundle && bundle.previewState;
+            if (!previewResponse || !previewResponse.ok) {
+              setStatus(previewResponse && previewResponse.message ? previewResponse.message : 'Failed to load selected row.', true);
               return;
             }
 
@@ -1769,10 +1818,13 @@
             }
 
             latestAcceptedRequestId = requestId;
-            latestServerResponse = response;
-            mergeRowCache(response);
+            latestServerResponse = previewResponse;
+            if (actualResponse && actualResponse.ok) {
+              mergeRowCache(actualResponse);
+            }
+            mergeRowCache(previewResponse);
 
-            const actualNext = selectionFromResponse(response);
+            const actualNext = selectionFromResponse(actualResponse);
             const actualChanged = selectionFingerprint(actualSelection) !== selectionFingerprint(actualNext);
             actualSelection = actualNext;
 
@@ -1780,7 +1832,7 @@
               internalSelection = { ...actualSelection };
             }
 
-            const nextSignature = buildServerSignature(response);
+            const nextSignature = buildServerSignature(previewResponse);
             if (nextSignature !== lastServerSignature || actualChanged) {
               lastServerSignature = nextSignature;
               renderCurrentView();
@@ -1789,9 +1841,10 @@
             setStatus('');
           })
           .withFailureHandler((error) => {
+            finishPollRefresh();
             setStatus(error && error.message ? error.message : 'Failed to load selected row.', true);
           })
-          .getPreviewState();
+          .getPreviewStateBundle(previewRequest);
       }
 
       function requestInternalSelectionRow(row) {
@@ -1806,27 +1859,7 @@
           a1Notation: buildA1Notation(targetRow, internalSelection.column),
         };
         renderCurrentView();
-
-        google.script.run
-          .withSuccessHandler((response) => {
-            if (!response || !response.ok) {
-              setStatus(response && response.message ? response.message : 'Failed to load row preview.', true);
-              return;
-            }
-
-            latestServerResponse = response;
-            mergeRowCache(response);
-            renderCurrentView();
-            setStatus('');
-          })
-          .withFailureHandler((error) => {
-            setStatus(error && error.message ? error.message : 'Failed to load row preview.', true);
-          })
-          .getPreviewStateForPosition({
-            sheetName: internalSelection.sheetName,
-            row: targetRow,
-            column: internalSelection.column,
-          });
+        requestPollRefresh();
       }
 
       moveUpButtonEl.addEventListener('click', () => {
@@ -1972,8 +2005,8 @@
 
       function startPolling() {
         renderInitialLayout();
-        refreshSelection();
-        window.setInterval(refreshSelection, pollIntervalMs);
+        requestPollRefresh();
+        window.setInterval(requestPollRefresh, pollIntervalMs);
       }
 
       startPolling();

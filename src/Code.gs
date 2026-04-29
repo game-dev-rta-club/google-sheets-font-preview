@@ -192,6 +192,21 @@ function getPreviewState() {
   return state;
 }
 
+function getPreviewStateBundle(request) {
+  var actualState = readActiveRangeState_();
+  var previewState = actualState;
+
+  if (request) {
+    previewState = getPreviewStateForPosition(request);
+  }
+
+  return {
+    ok: Boolean(previewState && previewState.ok),
+    actualState: actualState,
+    previewState: previewState,
+  };
+}
+
 function getPreviewStateForPosition(request) {
   if (!request) {
     return { ok: false, message: 'Missing request.' };
@@ -311,18 +326,24 @@ function readActiveRangeState_() {
 }
 
 function createPreviewStateFromCoordinates_(spreadsheet, sheet, row, column, triggerSource) {
-  var cell = sheet.getRange(row, column, 1, 1);
   var now = new Date();
   var headerValues = getHeaderValues_(sheet);
-  var currentRowState = createRowState_(sheet, row, headerValues);
+  var lastColumn = headerValues.length;
   var selectedHeaderKey = createHeaderKey_(column, headerValues[column - 1] || '');
-  var rowWindow = createRowWindow_(sheet, row, headerValues, getFontPreviewConfig_().rowWindowRadius);
+  var radius = getFontPreviewConfig_().rowWindowRadius;
+  var rowWindowStart = Math.max(2, row - radius);
+  var rowWindowEnd = Math.min(sheet.getMaxRows(), row + radius);
+  var rowWindowData = createRowDataBlock_(sheet, rowWindowStart, rowWindowEnd - rowWindowStart + 1, lastColumn);
+  var currentRowState = row >= rowWindowStart && row <= rowWindowEnd
+    ? createRowStateFromBlockRow_(row, headerValues, rowWindowData, row - rowWindowStart)
+    : createSingleRowState_(sheet, row, headerValues, lastColumn);
+  var rowWindow = createRowWindowFromBlock_(rowWindowStart, rowWindowEnd, headerValues, rowWindowData);
 
   return {
     ok: true,
     spreadsheetName: spreadsheet.getName(),
     sheetName: sheet.getName(),
-    a1Notation: cell.getA1Notation(),
+    a1Notation: buildA1Notation_(row, column),
     row: row,
     column: column,
     selectedHeaderKey: selectedHeaderKey,
@@ -386,6 +407,77 @@ function createRowState_(sheet, row, headerValues) {
   };
 }
 
+function createRowDataBlock_(sheet, startRow, rowCount, lastColumn) {
+  if (rowCount <= 0 || lastColumn <= 0) {
+    return {
+      values: [],
+      richTextValues: [],
+      displayValues: [],
+      formulas: [],
+    };
+  }
+
+  var range = sheet.getRange(startRow, 1, rowCount, lastColumn);
+  return {
+    values: range.getValues(),
+    richTextValues: range.getRichTextValues(),
+    displayValues: range.getDisplayValues(),
+    formulas: range.getFormulas(),
+  };
+}
+
+function createSingleRowState_(sheet, row, headerValues, lastColumn) {
+  var rowData = createRowDataBlock_(sheet, row, 1, lastColumn);
+  return createRowStateFromBlockRow_(row, headerValues, rowData, 0);
+}
+
+function createRowWindowFromBlock_(startRow, endRow, headerValues, rowData) {
+  var rows = [];
+  for (var row = startRow; row <= endRow; row++) {
+    rows.push(createRowStateFromBlockRow_(row, headerValues, rowData, row - startRow));
+  }
+  return rows;
+}
+
+function createRowStateFromBlockRow_(row, headerValues, rowData, rowOffset) {
+  var columns = [];
+  var valuesRow = rowData.values[rowOffset] || [];
+  var richTextRow = rowData.richTextValues[rowOffset] || [];
+  var displayRow = rowData.displayValues[rowOffset] || [];
+  var formulaRow = rowData.formulas[rowOffset] || [];
+
+  for (var columnIndex = 1; columnIndex <= headerValues.length; columnIndex++) {
+    var headerName = (headerValues[columnIndex - 1] || '').trim();
+    if (!headerName) {
+      continue;
+    }
+
+    var preview = readCellPreviewValues_(
+      valuesRow[columnIndex - 1],
+      richTextRow[columnIndex - 1],
+      displayRow[columnIndex - 1],
+      formulaRow[columnIndex - 1]
+    );
+
+    columns.push({
+      key: createHeaderKey_(columnIndex, headerName),
+      label: headerName,
+      columnIndex: columnIndex,
+      a1Notation: buildA1Notation_(row, columnIndex),
+      hasImage: preview.hasImage,
+      imageUrl: preview.imageUrl,
+      text: preview.text,
+      hasText: preview.hasText,
+      formula: preview.formula,
+    });
+  }
+
+  return {
+    row: row,
+    columns: columns,
+  };
+}
+
 function createHeaderKey_(columnIndex, headerName) {
   return String(columnIndex) + ':' + headerName;
 }
@@ -395,6 +487,11 @@ function readCellPreview_(range) {
   var richText = range.getRichTextValue();
   var displayValue = range.getDisplayValue();
   var formula = range.getFormula();
+
+  return readCellPreviewValues_(value, richText, displayValue, formula);
+}
+
+function readCellPreviewValues_(value, richText, displayValue, formula) {
 
   var imageUrl = getImageUrlFromValue_(value);
   if (!imageUrl) {
@@ -411,6 +508,23 @@ function readCellPreview_(range) {
     hasText: text.trim() !== '',
     formula: formula || '',
   };
+}
+
+function buildA1Notation_(row, column) {
+  return columnToA1Letters_(column) + String(row);
+}
+
+function columnToA1Letters_(column) {
+  var value = Math.max(1, Number(column) || 1);
+  var result = '';
+
+  while (value > 0) {
+    var remainder = (value - 1) % 26;
+    result = String.fromCharCode(65 + remainder) + result;
+    value = Math.floor((value - 1) / 26);
+  }
+
+  return result;
 }
 
 function getImageUrlFromValue_(value) {
