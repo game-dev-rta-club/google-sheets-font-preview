@@ -4,8 +4,6 @@ Google Sheets Font Preview is a Google Apps Script sidebar for reviewing and edi
 
 It is useful for localization, translation review, font-aware copy checking, and any workflow where people need to compare spreadsheet text with its actual visual look before using it in an app, website, game, document, or other product.
 
-Try the sample sheet here: [Google Sheets Font Preview Sample](https://docs.google.com/spreadsheets/d/1RXvbx0FDQm0sOkM-KyZiOXSSXRt4qzh0erU6QdNlUsc/edit?gid=0#gid=0)
-
 ## Features
 
 ### Review and edit text with real fonts in a Google Sheets sidebar
@@ -34,52 +32,42 @@ Use `screenshot` and `note` columns to show extra context needed for translation
 
 ## Quick Start
 
-### Use from GitHub with npx
+### Use with `clasp`
 
-Run these commands inside an empty working directory or inside the folder where you want to keep the Apps Script project files:
+This is the recommended setup.
 
-```bash
-npx github:game-dev-rta-club/google-sheets-font-preview setup-clasp
-npx github:game-dev-rta-club/google-sheets-font-preview push-clasp
-```
-
-### Use directly in Apps Script
-
-1. Open your target Google Sheet.
-2. Open `Extensions > Apps Script`.
-3. Copy these files into the Apps Script project:
-   - [`src/Code.gs`](src/Code.gs)
-   - [`src/Sidebar.html`](src/Sidebar.html)
-   - [`src/Config.gs`](src/Config.gs)
-4. Save the project.
-5. Reload the spreadsheet.
-6. Open `Localization > Font Preview`.
-
-### Use with clasp
+1. Clone this repository.
+2. Install dependencies:
 
 ```bash
 npm install
+```
+
+3. Run the guided setup:
+
+```bash
 npm run setup-clasp
+```
+
+4. Push the current local files to your Apps Script project:
+
+```bash
 npm run push-clasp
 ```
 
-Then reload the spreadsheet and open `Localization > Font Preview`.
+5. Reload the spreadsheet tab.
+6. Open `Localization > Font Preview`.
+7. Approve the requested permissions if Google asks for authorization.
 
-`setup-clasp` also copies the required project files into the current directory.
+For the full `clasp` workflow and GitHub-based usage, see [docs/development-with-clasp.md](docs/development-with-clasp.md).
 
-During the first setup, Google may show an "app isn't verified" warning for the Apps Script OAuth flow. If you are the developer of the target sheet or script project, continue with your developer account and approve the requested access to finish setup.
+### Copy into Apps Script manually
 
-You can pass your Apps Script URL or raw `scriptId` directly to setup:
+If you prefer not to use `clasp`, you can still copy these files into `Extensions > Apps Script`:
 
-```bash
-npm run setup-clasp -- https://script.google.com/home/projects/<scriptId>/edit
-```
-
-If you are using the GitHub-based CLI instead of cloning this repository, you can do the same with:
-
-```bash
-npx github:game-dev-rta-club/google-sheets-font-preview setup-clasp -- https://script.google.com/home/projects/<scriptId>/edit
-```
+- [`src/Code.gs`](src/Code.gs)
+- [`src/Sidebar.html`](src/Sidebar.html)
+- [`src/Config.gs`](src/Config.gs)
 
 ## Contributing
 
@@ -89,7 +77,7 @@ Contributions are welcome.
 - Open a pull request for fixes or improvements
 - Improve documentation, setup flow, or usability
 
-For contribution details, see [CONTRIBUTING.md](CONTRIBUTING.md).
+For contribution details, see [docs/contributing.md](docs/contributing.md).
 
 ## License
 
