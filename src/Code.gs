@@ -54,11 +54,9 @@ function sanitizeProjectOptions_(rawOptions) {
         1,
         Number(textPreview.defaultHeightUnits) || defaults.textPreview.defaultHeightUnits
       ),
-      useSharedPreviewSize: Boolean(
-        textPreview.useSharedPreviewSize !== undefined
-          ? textPreview.useSharedPreviewSize
-          : textPreview.fixedFontSize
-      ),
+      useSharedPreviewSize: textPreview.useSharedPreviewSize === undefined
+        ? defaults.textPreview.useSharedPreviewSize
+        : Boolean(textPreview.useSharedPreviewSize),
     },
     languageSettings: {
       defaultLanguage: String(languageSettings.defaultLanguage || defaults.languageSettings.defaultLanguage).trim() || defaults.languageSettings.defaultLanguage,
