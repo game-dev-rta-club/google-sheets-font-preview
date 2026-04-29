@@ -296,14 +296,6 @@
         white-space: pre-wrap;
       }
 
-      .slot-metrics {
-        margin-top: 4px;
-        font-size: 10px;
-        line-height: 1.3;
-        color: #978f84;
-        white-space: pre-wrap;
-      }
-
       .status {
         min-height: 18px;
         font-size: 12px;
@@ -1416,34 +1408,6 @@
         return messages.join('\n');
       }
 
-      function getContextMetricDebugText(rowContext, config) {
-        const widthColumn = resolveContextColumnByNormalizedLabel(
-          rowContext,
-          normalizeLabel(config.widthHeaderName)
-        );
-        const heightColumn = resolveContextColumnByNormalizedLabel(
-          rowContext,
-          normalizeLabel(config.heightHeaderName)
-        );
-
-        function formatMetricValue(column) {
-          if (!column) {
-            return 'missing';
-          }
-          if (column.isLoading) {
-            return 'Loading...';
-          }
-
-          const rawText = String(column.text || '').trim();
-          return rawText || 'empty';
-        }
-
-        return [
-          `width: ${formatMetricValue(widthColumn)}`,
-          `height: ${formatMetricValue(heightColumn)}`,
-        ].join('\n');
-      }
-
       function queueTextSave(slotIndex, immediate) {
         const slotState = slotStates[slotIndex];
         const effectiveTarget = slotState && (slotState.editLockTarget || slotState.target);
@@ -1606,11 +1570,6 @@
         helper.style.display = 'none';
         card.appendChild(helper);
 
-        const metrics = document.createElement('div');
-        metrics.className = 'slot-metrics';
-        metrics.style.display = 'none';
-        card.appendChild(metrics);
-
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach((eventName) => {
           dropzone.addEventListener(eventName, preventDefaults);
         });
@@ -1699,7 +1658,7 @@
 
         textSectionsEl.appendChild(card);
 
-        return { card, columnSelectWrap, columnSelect, dropzone, fileInput, frameOuter, frameInner, preview, helper, metrics };
+        return { card, columnSelectWrap, columnSelect, dropzone, fileInput, frameOuter, frameInner, preview, helper };
       }
 
       function ensureSlotViews() {
@@ -1774,13 +1733,9 @@
             const helperText = getBasePanelHelperText(viewColumns, config);
             view.helper.textContent = helperText;
             view.helper.style.display = helperText ? 'block' : 'none';
-            view.metrics.textContent = '';
-            view.metrics.style.display = 'none';
           } else {
             view.helper.textContent = '';
             view.helper.style.display = 'none';
-            view.metrics.textContent = getContextMetricDebugText(rowContext, config);
-            view.metrics.style.display = 'block';
           }
 
           applyTextSizing(view, frameMetrics);
