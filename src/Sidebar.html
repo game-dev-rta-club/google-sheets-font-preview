@@ -1606,7 +1606,14 @@
           const effectiveTarget = slotState.editLockTarget || slotState.target;
           const effectiveFingerprint = slotState.editLockFingerprint || slotState.targetFingerprint;
           const viewColumns = effectiveTarget
-            ? ((getCachedRow(effectiveTarget.sheetName, effectiveTarget.row) || {}).columns || [])
+            ? ((getCachedRow(effectiveTarget.sheetName, effectiveTarget.row) || {}).columns
+              || (
+                internalSelection
+                && effectiveTarget.sheetName === internalSelection.sheetName
+                && effectiveTarget.row === internalSelection.row
+              ? columns
+              : buildFallbackColumns(effectiveTarget.sheetName, effectiveTarget.row)
+            ))
             : columns;
           const targetColumn = effectiveTarget ? findColumnByKey(viewColumns, effectiveTarget.headerKey) : null;
           const fontState = getFontStateForKey(effectiveTarget ? effectiveTarget.headerKey : '');
