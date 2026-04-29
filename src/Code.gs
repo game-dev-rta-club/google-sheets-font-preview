@@ -177,66 +177,44 @@ function createSampleSheet() {
 
   var options = getResolvedProjectOptions_();
   var fixedStrings = options.fixedStrings || {};
-  var defaultLanguage = String((options.languageSettings || {}).defaultLanguage || 'en').trim() || 'en';
-  var languageHeaders = buildSampleLanguageHeaders_(defaultLanguage);
-  var sheet = spreadsheet.insertSheet(createUniqueSampleSheetName_(spreadsheet, 'Sample'));
+  var languageHeaders = buildSampleLanguageHeaders_();
+  var sheet = spreadsheet.insertSheet(createUniqueSampleSheetName_(spreadsheet, 'Font Preview Sample'));
 
-  var headers = [
-    fixedStrings.screenshot,
-    fixedStrings.note,
+  var headers = languageHeaders.concat([
     fixedStrings.width,
     fixedStrings.height,
-  ].concat(languageHeaders);
+    fixedStrings.screenshot,
+    fixedStrings.note,
+  ]);
 
   var sampleRows = buildSampleSheetRows_(languageHeaders);
   var values = sampleRows.map(function(entry) { return entry.values; });
   sheet.getRange(1, 1, values.length + 1, headers.length).setValues([headers].concat(values));
-  applySampleSheetImages_(sheet, sampleRows);
+  applySampleSheetImages_(sheet, sampleRows, headers.indexOf(fixedStrings.screenshot) + 1);
   sheet.setFrozenRows(1);
-  formatSampleSheet_(sheet, headers.length, values.length + 1);
+  formatSampleSheet_(sheet, headers, values.length + 1, fixedStrings);
   spreadsheet.setActiveSheet(sheet);
 
-  var defaultLanguageColumnIndex = headers.indexOf(defaultLanguage) + 1;
-  if (defaultLanguageColumnIndex > 0) {
-    sheet.setActiveRange(sheet.getRange(2, defaultLanguageColumnIndex));
-  }
+  sheet.setActiveRange(sheet.getRange(2, 1));
 
   return {
     ok: true,
     spreadsheetId: spreadsheet.getId(),
     sheetId: sheet.getSheetId(),
-    url: spreadsheet.getUrl() + '#gid=' + sheet.getSheetId(),
+    sheetName: sheet.getName(),
   };
 }
 
-function buildSampleLanguageHeaders_(defaultLanguage) {
-  var candidates = [
-    defaultLanguage,
+function buildSampleLanguageHeaders_() {
+  return [
     'en',
-    'ja',
     'zh',
-    'ko',
+    'hi',
+    'es',
     'fr',
+    'ar',
+    'bn',
   ];
-  var seen = {};
-  var headers = [];
-
-  candidates.forEach(function(candidate) {
-    var value = String(candidate || '').trim();
-    if (!value) {
-      return;
-    }
-
-    var normalized = normalizeHeaderName_(value);
-    if (!normalized || seen[normalized]) {
-      return;
-    }
-
-    seen[normalized] = true;
-    headers.push(value);
-  });
-
-  return headers.slice(0, 5);
 }
 
 function buildSampleSheetRows_(languageHeaders) {
@@ -254,10 +232,12 @@ function buildSampleSheetRows_(languageHeaders) {
       height: 1,
       texts: {
         en: 'Play',
-        ja: 'プレイ',
         zh: '开始',
-        ko: '플레이',
+        hi: 'चलाएं',
+        es: 'Jugar',
         fr: 'Jouer',
+        ar: 'ابدأ',
+        bn: 'খেলুন',
       },
     },
     {
@@ -267,10 +247,12 @@ function buildSampleSheetRows_(languageHeaders) {
       height: 1,
       texts: {
         en: 'Save Game',
-        ja: 'セーブ',
         zh: '保存游戏',
-        ko: '게임 저장',
+        hi: 'गेम सहेजें',
+        es: 'Guardar',
         fr: 'Sauvegarder',
+        ar: 'حفظ اللعبة',
+        bn: 'গেম সেভ',
       },
     },
     {
@@ -280,10 +262,12 @@ function buildSampleSheetRows_(languageHeaders) {
       height: 1,
       texts: {
         en: 'Inventory',
-        ja: 'インベントリ',
         zh: '物品栏',
-        ko: '인벤토리',
+        hi: 'इन्वेंटरी',
+        es: 'Inventario',
         fr: 'Inventaire',
+        ar: 'المخزون',
+        bn: 'ইনভেন্টরি',
       },
     },
     {
@@ -293,10 +277,12 @@ function buildSampleSheetRows_(languageHeaders) {
       height: 2,
       texts: {
         en: 'Are you sure you want to delete this save file?',
-        ja: 'このセーブデータを削除しますか？',
         zh: '确定要删除这个存档吗？',
-        ko: '이 저장 데이터를 삭제하시겠습니까?',
+        hi: 'क्या आप सचमुच इस सेव फ़ाइल को मिटाना चाहते हैं?',
+        es: '¿Seguro que quieres borrar esta partida guardada?',
         fr: 'Voulez-vous vraiment supprimer cette sauvegarde ?',
+        ar: 'هل تريد بالتأكيد حذف ملف الحفظ هذا؟',
+        bn: 'আপনি কি নিশ্চিত যে এই সেভ ফাইলটি মুছে ফেলতে চান?',
       },
     },
     {
@@ -306,10 +292,12 @@ function buildSampleSheetRows_(languageHeaders) {
       height: 3,
       texts: {
         en: 'This item can only be used during the night event.',
-        ja: 'このアイテムは夜のイベント中にのみ使用できます。',
         zh: '该物品只能在夜间事件期间使用。',
-        ko: '이 아이템은 야간 이벤트 중에만 사용할 수 있습니다.',
+        hi: 'यह आइटम केवल रात के इवेंट के दौरान इस्तेमाल किया जा सकता है।',
+        es: 'Este objeto solo se puede usar durante el evento nocturno.',
         fr: 'Cet objet ne peut être utilisé que pendant l’événement de nuit.',
+        ar: 'لا يمكن استخدام هذا العنصر إلا أثناء حدث الليل.',
+        bn: 'এই আইটেমটি শুধু রাতের ইভেন্ট চলাকালীন ব্যবহার করা যাবে।',
       },
     },
     {
@@ -319,26 +307,28 @@ function buildSampleSheetRows_(languageHeaders) {
       height: 4,
       texts: {
         en: 'Tap and hold to open the advanced settings panel.',
-        ja: '長押しすると詳細設定パネルを開きます。',
         zh: '长按即可打开高级设置面板。',
-        ko: '길게 눌러 고급 설정 패널을 엽니다.',
+        hi: 'उन्नत सेटिंग पैनल खोलने के लिए टैप करके दबाए रखें।',
+        es: 'Mantén pulsado para abrir el panel de ajustes avanzados.',
         fr: 'Appuyez longuement pour ouvrir le panneau des paramètres avancés.',
+        ar: 'اضغط مطولاً لفتح لوحة الإعدادات المتقدمة.',
+        bn: 'অ্যাডভান্সড সেটিংস প্যানেল খুলতে চেপে ধরে রাখুন।',
       },
     },
   ];
 
   return entries.map(function(entry) {
-    var row = [
-      '',
-      entry.note,
-      entry.width,
-      entry.height,
-    ];
+    var row = [];
 
     languageHeaders.forEach(function(languageHeader) {
       var normalized = normalizeHeaderName_(languageHeader);
       row.push(entry.texts[normalized] || entry.texts.en || '');
     });
+
+    row.push(entry.width);
+    row.push(entry.height);
+    row.push('');
+    row.push(entry.note);
 
     return {
       screenshotUrl: entry.screenshotUrl,
@@ -351,7 +341,7 @@ function buildCommonsImageUrl_(fileName) {
   return 'https://commons.wikimedia.org/wiki/Special:FilePath/' + encodeURIComponent(fileName);
 }
 
-function applySampleSheetImages_(sheet, rows) {
+function applySampleSheetImages_(sheet, rows, screenshotColumnIndex) {
   rows.forEach(function(row, index) {
     var imageUrl = row.screenshotUrl;
     if (!imageUrl) {
@@ -364,7 +354,7 @@ function applySampleSheetImages_(sheet, rows) {
       .setAltTextDescription('Sample screenshot for Google Sheets Font Preview')
       .build();
 
-    sheet.getRange(index + 2, 1).setValue(image);
+    sheet.getRange(index + 2, screenshotColumnIndex).setValue(image);
   });
 }
 
@@ -386,7 +376,13 @@ function createUniqueSampleSheetName_(spreadsheet, baseName) {
   return baseName + ' ' + index;
 }
 
-function formatSampleSheet_(sheet, totalColumns, totalRows) {
+function formatSampleSheet_(sheet, headers, totalRows, fixedStrings) {
+  var totalColumns = headers.length;
+  var widthColumnIndex = headers.indexOf(fixedStrings.width) + 1;
+  var heightColumnIndex = headers.indexOf(fixedStrings.height) + 1;
+  var screenshotColumnIndex = headers.indexOf(fixedStrings.screenshot) + 1;
+  var noteColumnIndex = headers.indexOf(fixedStrings.note) + 1;
+
   sheet.getRange(1, 1, 1, totalColumns)
     .setFontWeight('bold')
     .setBackground('#efe8d5');
@@ -395,13 +391,21 @@ function formatSampleSheet_(sheet, totalColumns, totalRows) {
     .setVerticalAlignment('middle')
     .setWrap(true);
 
-  sheet.setColumnWidth(1, 220);
-  sheet.setColumnWidth(2, 260);
-  sheet.setColumnWidth(3, 72);
-  sheet.setColumnWidth(4, 72);
-
-  for (var column = 5; column <= totalColumns; column += 1) {
+  for (var column = 1; column <= totalColumns; column += 1) {
     sheet.setColumnWidth(column, 180);
+  }
+
+  if (widthColumnIndex > 0) {
+    sheet.setColumnWidth(widthColumnIndex, 72);
+  }
+  if (heightColumnIndex > 0) {
+    sheet.setColumnWidth(heightColumnIndex, 72);
+  }
+  if (screenshotColumnIndex > 0) {
+    sheet.setColumnWidth(screenshotColumnIndex, 220);
+  }
+  if (noteColumnIndex > 0) {
+    sheet.setColumnWidth(noteColumnIndex, 260);
   }
 
   for (var row = 2; row <= totalRows; row += 1) {

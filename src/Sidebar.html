@@ -2096,13 +2096,13 @@
         google.script.run
           .withSuccessHandler((result) => {
             createSampleSheetButtonEl.disabled = false;
-            if (!result || result.ok === false || !result.url) {
+            if (!result || result.ok === false) {
               setStatus(result && result.message ? result.message : 'Failed to create sample sheet.', true);
               return;
             }
 
-            window.open(result.url, '_blank', 'noopener');
-            setStatus('Sample sheet created.');
+            closeHelpModal();
+            setStatus(`Sample tab created: ${result.sheetName || 'Sample'}.`);
           })
           .withFailureHandler((error) => {
             createSampleSheetButtonEl.disabled = false;
