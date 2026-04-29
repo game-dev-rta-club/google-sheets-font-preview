@@ -323,6 +323,13 @@
         gap: 8px;
       }
 
+      .settings-button {
+        min-width: 44px;
+        padding: 8px 10px;
+        font-size: 18px;
+        line-height: 1;
+      }
+
       .control-group-column {
         display: flex;
         flex-direction: column;
@@ -365,16 +372,132 @@
         font-size: 18px;
         line-height: 1;
       }
+
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 12px;
+        background: rgba(38, 35, 29, 0.42);
+        z-index: 1000;
+      }
+
+      .modal-backdrop.is-open {
+        display: flex;
+      }
+
+      .modal-panel {
+        width: min(540px, 100%);
+        max-height: calc(100vh - 24px);
+        overflow: auto;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        padding: 12px;
+        display: grid;
+        gap: 12px;
+      }
+
+      .modal-title {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+      }
+
+      .modal-section {
+        border: 1px solid var(--line);
+        background: #fff;
+        padding: 10px;
+        display: grid;
+        gap: 8px;
+      }
+
+      .modal-section h3 {
+        margin: 0;
+        font-size: 13px;
+      }
+
+      .modal-copy {
+        margin: 0;
+        color: var(--subtle);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .settings-grid {
+        display: grid;
+        gap: 8px;
+      }
+
+      .settings-grid.two-columns {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .checkbox-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .checkbox-row input {
+        margin-top: 2px;
+      }
+
+      .checkbox-row label {
+        font-size: 13px;
+        line-height: 1.4;
+      }
+
+      .field-row {
+        display: grid;
+        gap: 4px;
+      }
+
+      .field-row label {
+        font-size: 12px;
+        color: var(--subtle);
+      }
+
+      .field-row input,
+      .field-row textarea {
+        width: 100%;
+        padding: 8px 10px;
+        border: 1px solid var(--line);
+        background: #fff;
+        font-size: 13px;
+        font-family: inherit;
+      }
+
+      .field-row textarea {
+        min-height: 84px;
+        resize: vertical;
+      }
+
+      .readonly-list {
+        padding: 8px 10px;
+        border: 1px solid var(--line);
+        background: #f7f5f0;
+        font-size: 12px;
+        color: var(--subtle);
+        white-space: pre-wrap;
+      }
+
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+      }
     </style>
   </head>
   <body>
     <div class="stack">
-      <section class="card">
-        <div class="section-title">Screenshot</div>
+      <section id="contextCard" class="card">
+        <div id="screenshotTitle" class="section-title">Screenshot</div>
         <div id="imagePreview" class="preview-screen">
           <div class="preview-empty">No Image</div>
         </div>
-        <div class="section-title note-title">Note</div>
+        <div id="noteTitle" class="section-title note-title">Note</div>
         <div id="notePreview" class="preview-note">ー</div>
       </section>
 
@@ -392,6 +515,7 @@
           <div class="control-group">
             <button id="moveUpButton" class="nav-button" type="button">▲</button>
             <button id="moveDownButton" class="nav-button" type="button">▼</button>
+            <button id="settingsButton" class="settings-button" type="button" aria-label="Open options">⚙</button>
           </div>
         </div>
       </section>
@@ -399,18 +523,118 @@
       <div id="status" class="status"></div>
     </div>
 
+    <div id="settingsModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <div class="modal-panel">
+        <h2 id="settingsTitle" class="modal-title">Project Options</h2>
+
+        <section class="modal-section">
+          <h3>Visible Panels</h3>
+          <p class="modal-copy">Choose which parts of the sidebar should be visible for everyone using this spreadsheet.</p>
+          <div class="settings-grid two-columns">
+            <div class="checkbox-row"><input id="optShowScreenshot" type="checkbox"><label for="optShowScreenshot"><strong>SCREENSHOT</strong><br>Show the screenshot preview area.</label></div>
+            <div class="checkbox-row"><input id="optShowNote" type="checkbox"><label for="optShowNote"><strong>NOTE</strong><br>Show the note area below the screenshot.</label></div>
+            <div class="checkbox-row"><input id="optShowBaseLanguage" type="checkbox"><label for="optShowBaseLanguage"><strong>BASE LANGUAGE</strong><br>Show the base language preview panel.</label></div>
+            <div class="checkbox-row"><input id="optShowLocalization" type="checkbox"><label for="optShowLocalization"><strong>LOCALIZATION</strong><br>Show the editable localization preview panel.</label></div>
+          </div>
+        </section>
+
+        <section class="modal-section">
+          <h3>Text Display</h3>
+          <p class="modal-copy">Control the default preview font size and whether the preview should stop resizing when width and height columns are missing.</p>
+          <div class="settings-grid">
+            <div class="field-row">
+              <label for="optDefaultFontSize">Default font size (px)</label>
+              <input id="optDefaultFontSize" type="number" min="8" step="1">
+            </div>
+            <div class="checkbox-row">
+              <input id="optFixedFontSize" type="checkbox">
+              <label for="optFixedFontSize"><strong>Do not resize text automatically</strong><br>Use the default font size and hide width/height warnings when those columns are missing.</label>
+            </div>
+          </div>
+        </section>
+
+        <section class="modal-section">
+          <h3>Language Settings</h3>
+          <p class="modal-copy">Set the default language column and exclude extra columns from language dropdowns and localization editing.</p>
+          <div class="settings-grid">
+            <div class="field-row">
+              <label for="optDefaultLanguage">Default language</label>
+              <input id="optDefaultLanguage" type="text" placeholder="en">
+            </div>
+            <div class="field-row">
+              <label>Built-in non-language columns</label>
+              <div id="optReservedColumns" class="readonly-list"></div>
+            </div>
+            <div class="field-row">
+              <label for="optIgnoredColumns">User-defined non-language columns</label>
+              <textarea id="optIgnoredColumns" placeholder="One column name per line"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <section class="modal-section">
+          <h3>Fixed Header Names</h3>
+          <p class="modal-copy">Change the header names that the sidebar treats as fixed-purpose columns.</p>
+          <div class="settings-grid two-columns">
+            <div class="field-row">
+              <label for="optHeaderScreenshot">SCREENSHOT</label>
+              <input id="optHeaderScreenshot" type="text">
+            </div>
+            <div class="field-row">
+              <label for="optHeaderNote">NOTE</label>
+              <input id="optHeaderNote" type="text">
+            </div>
+            <div class="field-row">
+              <label for="optHeaderWidth">WIDTH</label>
+              <input id="optHeaderWidth" type="text">
+            </div>
+            <div class="field-row">
+              <label for="optHeaderHeight">HEIGHT</label>
+              <input id="optHeaderHeight" type="text">
+            </div>
+          </div>
+        </section>
+
+        <div class="modal-actions">
+          <button id="settingsCancelButton" type="button">Cancel</button>
+          <button id="settingsSaveButton" type="button">OK</button>
+        </div>
+      </div>
+    </div>
+
     <script>
-      const BOOTSTRAP_CONFIG = Object.freeze(<?!= bootstrapConfigJson ?>);
+      const BOOTSTRAP_CONFIG = <?!= bootstrapConfigJson ?>;
 
       const statusEl = document.getElementById('status');
+      const contextCardEl = document.getElementById('contextCard');
+      const screenshotTitleEl = document.getElementById('screenshotTitle');
       const imagePreviewEl = document.getElementById('imagePreview');
+      const noteTitleEl = document.getElementById('noteTitle');
       const notePreviewEl = document.getElementById('notePreview');
       const textSectionsEl = document.getElementById('textSections');
       const selectionChipEl = document.getElementById('selectionChip');
       const selectButtonEl = document.getElementById('selectButton');
       const moveUpButtonEl = document.getElementById('moveUpButton');
       const moveDownButtonEl = document.getElementById('moveDownButton');
+      const settingsButtonEl = document.getElementById('settingsButton');
+      const settingsModalEl = document.getElementById('settingsModal');
+      const settingsCancelButtonEl = document.getElementById('settingsCancelButton');
+      const settingsSaveButtonEl = document.getElementById('settingsSaveButton');
+      const optShowScreenshotEl = document.getElementById('optShowScreenshot');
+      const optShowNoteEl = document.getElementById('optShowNote');
+      const optShowBaseLanguageEl = document.getElementById('optShowBaseLanguage');
+      const optShowLocalizationEl = document.getElementById('optShowLocalization');
+      const optDefaultFontSizeEl = document.getElementById('optDefaultFontSize');
+      const optFixedFontSizeEl = document.getElementById('optFixedFontSize');
+      const optDefaultLanguageEl = document.getElementById('optDefaultLanguage');
+      const optReservedColumnsEl = document.getElementById('optReservedColumns');
+      const optIgnoredColumnsEl = document.getElementById('optIgnoredColumns');
+      const optHeaderScreenshotEl = document.getElementById('optHeaderScreenshot');
+      const optHeaderNoteEl = document.getElementById('optHeaderNote');
+      const optHeaderWidthEl = document.getElementById('optHeaderWidth');
+      const optHeaderHeightEl = document.getElementById('optHeaderHeight');
 
+      let currentConfig = JSON.parse(JSON.stringify(BOOTSTRAP_CONFIG));
       const pollIntervalMs = BOOTSTRAP_CONFIG.pollIntervalMs;
       const saveDebounceMs = BOOTSTRAP_CONFIG.saveDebounceMs;
 
@@ -441,14 +665,35 @@
 
       function getConfig(response) {
         if (response && response.config) {
+          currentConfig = response.config;
           return response.config;
         }
 
-        if (BOOTSTRAP_CONFIG) {
-          return BOOTSTRAP_CONFIG;
+        if (currentConfig) {
+          return currentConfig;
         }
 
         throw new Error('Missing preview config.');
+      }
+
+      function getProjectOptions(config) {
+        return (config && config.projectOptions) || (currentConfig && currentConfig.projectOptions) || {};
+      }
+
+      function getVisibleSections(config) {
+        return getProjectOptions(config).visibleSections || {};
+      }
+
+      function getLanguageSettings(config) {
+        return getProjectOptions(config).languageSettings || {};
+      }
+
+      function getTextDisplaySettings(config) {
+        return getProjectOptions(config).textDisplay || {};
+      }
+
+      function getFixedStrings(config) {
+        return getProjectOptions(config).fixedStrings || {};
       }
 
       function normalizeLabel(value) {
@@ -635,10 +880,12 @@
         }
 
         const normalizedLabel = normalizeLabel(column.label);
+        const ignoredColumns = (config.userIgnoredColumns || []).map(normalizeLabel);
         return normalizedLabel === normalizeLabel(config.screenshotHeaderName)
           || normalizedLabel === normalizeLabel(config.noteHeaderName)
           || normalizedLabel === normalizeLabel(config.widthHeaderName)
-          || normalizedLabel === normalizeLabel(config.heightHeaderName);
+          || normalizedLabel === normalizeLabel(config.heightHeaderName)
+          || ignoredColumns.includes(normalizedLabel);
       }
 
       function getPreviousLocalizationColumn(columns, config) {
@@ -668,7 +915,7 @@
         if (preferredBaseColumnKey) {
           const preferredColumn = findColumnByKey(columns, preferredBaseColumnKey);
           if (preferredColumn && !isFrozenLocalizationColumn(columns, preferredColumn.key, config)) {
-            return preferredColumn;
+              return preferredColumn;
           }
         }
 
@@ -729,10 +976,13 @@
         const outerUsableWidth = Math.max(20, frameOuter.clientWidth);
         const outerUsableHeight = Math.max(16, frameOuter.clientHeight);
         const reservedScrollbarWidth = getScrollbarWidthPx();
-        const fontSize = Math.max(8, Math.min(
-          (outerUsableWidth - reservedScrollbarWidth) / Math.max(frameMetrics.widthUnits, 1),
-          outerUsableHeight / Math.max(frameMetrics.heightUnits, 1)
-        ));
+        const textDisplay = getTextDisplaySettings(currentConfig);
+        const fontSize = textDisplay.fixedFontSize
+          ? Math.max(8, Number(textDisplay.defaultFontSizePx) || 20)
+          : Math.max(8, Math.min(
+              (outerUsableWidth - reservedScrollbarWidth) / Math.max(frameMetrics.widthUnits, 1),
+              outerUsableHeight / Math.max(frameMetrics.heightUnits, 1)
+            ));
 
         return {
           fontSize,
@@ -816,17 +1066,27 @@
       }
 
       function renderImageSection(columns, config) {
+        const visibleSections = getVisibleSections(config);
         const screenshotColumn = findColumnByNormalizedLabel(columns, normalizeLabel(config.screenshotHeaderName));
         const noteColumn = findColumnByNormalizedLabel(columns, normalizeLabel(config.noteHeaderName));
+        const showScreenshot = visibleSections.screenshot !== false;
+        const showNote = visibleSections.note !== false;
+
+        contextCardEl.style.display = (showScreenshot || showNote) ? '' : 'none';
+        screenshotTitleEl.style.display = showScreenshot ? '' : 'none';
+        imagePreviewEl.style.display = showScreenshot ? '' : 'none';
+        noteTitleEl.style.display = showNote ? '' : 'none';
+        notePreviewEl.style.display = showNote ? '' : 'none';
+
         imagePreviewEl.innerHTML = '';
         imagePreviewEl.className = 'preview-screen';
 
-        if (screenshotColumn && screenshotColumn.imageUrl) {
+        if (showScreenshot && screenshotColumn && screenshotColumn.imageUrl) {
           const img = document.createElement('img');
           img.src = screenshotColumn.imageUrl;
           img.alt = screenshotColumn.label;
           imagePreviewEl.appendChild(img);
-        } else {
+        } else if (showScreenshot) {
           const empty = document.createElement('div');
           empty.className = screenshotColumn ? 'preview-empty' : 'preview-empty placeholder';
           empty.textContent = screenshotColumn ? 'No Image' : 'Add a "screenshot" column to show images.';
@@ -836,11 +1096,17 @@
           imagePreviewEl.appendChild(empty);
         }
 
-        notePreviewEl.className = noteColumn ? 'preview-note' : 'preview-note placeholder';
-        notePreviewEl.textContent = noteColumn ? (noteColumn.text || 'ー') : 'Add a "note" column to show notes.';
+        if (showNote) {
+          notePreviewEl.className = noteColumn ? 'preview-note' : 'preview-note placeholder';
+          notePreviewEl.textContent = noteColumn ? (noteColumn.text || 'ー') : 'Add a "note" column to show notes.';
+        }
       }
 
       function getBasePanelHelperText(columns, config) {
+        if (getTextDisplaySettings(config).fixedFontSize) {
+          return '';
+        }
+
         const messages = [];
         if (!findColumnByNormalizedLabel(columns, normalizeLabel(config.widthHeaderName))) {
           messages.push(`Add a "${config.widthHeaderName}" column to match the real width.`);
@@ -1103,9 +1369,15 @@
       function renderTextSections(columns, config) {
         ensureSlotStates(columns, config);
         ensureSlotViews();
+        const visibleSections = getVisibleSections(config);
 
         slotStates.forEach((slotState, slotIndex) => {
           const view = slotViews[slotIndex];
+          const shouldShow = slotIndex === 0 ? visibleSections.baseLanguage !== false : visibleSections.localization !== false;
+          view.card.style.display = shouldShow ? '' : 'none';
+          if (!shouldShow) {
+            return;
+          }
           const effectiveTarget = slotState.editLockTarget || slotState.target;
           const effectiveFingerprint = slotState.editLockFingerprint || slotState.targetFingerprint;
           const viewColumns = effectiveTarget
@@ -1182,6 +1454,7 @@
 
       function renderInitialLayout() {
         const config = getConfig(null);
+        const visibleSections = getVisibleSections(config);
         if (slotStates.length === 0) {
           slotStates = [
             { target: null, targetFingerprint: '', editable: false, label: 'ー', draftValue: '', isDirty: false, debounceTimer: null, saveToken: 0, editLockTarget: null, editLockFingerprint: '' },
@@ -1190,9 +1463,16 @@
         }
 
         ensureSlotViews();
+        contextCardEl.style.display = (visibleSections.screenshot !== false || visibleSections.note !== false) ? '' : 'none';
+        screenshotTitleEl.style.display = visibleSections.screenshot !== false ? '' : 'none';
         imagePreviewEl.innerHTML = '<div class="preview-empty">No Image</div>';
+        imagePreviewEl.style.display = visibleSections.screenshot !== false ? '' : 'none';
+        noteTitleEl.style.display = visibleSections.note !== false ? '' : 'none';
+        notePreviewEl.style.display = visibleSections.note !== false ? '' : 'none';
         notePreviewEl.textContent = '';
         slotViews.forEach((view) => {
+          const shouldShow = slotViews.indexOf(view) === 0 ? visibleSections.baseLanguage !== false : visibleSections.localization !== false;
+          view.card.style.display = shouldShow ? '' : 'none';
           if (view.columnSelectWrap) {
             view.columnSelectWrap.style.display = '';
           }
@@ -1382,6 +1662,93 @@
             setStatus(error && error.message ? error.message : 'Failed to select cell.', true);
           })
           .moveSelectionTo(internalSelection.row, internalSelection.column);
+      });
+
+      function openSettingsModal() {
+        const options = getProjectOptions(currentConfig);
+        const visibleSections = options.visibleSections || {};
+        const textDisplay = options.textDisplay || {};
+        const languageSettings = options.languageSettings || {};
+        const fixedStrings = options.fixedStrings || {};
+
+        optShowScreenshotEl.checked = visibleSections.screenshot !== false;
+        optShowNoteEl.checked = visibleSections.note !== false;
+        optShowBaseLanguageEl.checked = visibleSections.baseLanguage !== false;
+        optShowLocalizationEl.checked = visibleSections.localization !== false;
+        optDefaultFontSizeEl.value = Number(textDisplay.defaultFontSizePx) || 20;
+        optFixedFontSizeEl.checked = Boolean(textDisplay.fixedFontSize);
+        optDefaultLanguageEl.value = languageSettings.defaultLanguage || '';
+        optReservedColumnsEl.textContent = (currentConfig.projectReservedHeaderNames || []).join('\n');
+        optIgnoredColumnsEl.value = (languageSettings.ignoredColumns || []).join('\n');
+        optHeaderScreenshotEl.value = fixedStrings.screenshot || '';
+        optHeaderNoteEl.value = fixedStrings.note || '';
+        optHeaderWidthEl.value = fixedStrings.width || '';
+        optHeaderHeightEl.value = fixedStrings.height || '';
+
+        settingsModalEl.classList.add('is-open');
+      }
+
+      function closeSettingsModal() {
+        settingsModalEl.classList.remove('is-open');
+      }
+
+      function collectProjectOptionsFromForm() {
+        return {
+          visibleSections: {
+            screenshot: optShowScreenshotEl.checked,
+            note: optShowNoteEl.checked,
+            baseLanguage: optShowBaseLanguageEl.checked,
+            localization: optShowLocalizationEl.checked,
+          },
+          textDisplay: {
+            defaultFontSizePx: Number(optDefaultFontSizeEl.value) || 20,
+            fixedFontSize: optFixedFontSizeEl.checked,
+          },
+          languageSettings: {
+            defaultLanguage: optDefaultLanguageEl.value,
+            ignoredColumns: optIgnoredColumnsEl.value,
+          },
+          fixedStrings: {
+            screenshot: optHeaderScreenshotEl.value,
+            note: optHeaderNoteEl.value,
+            width: optHeaderWidthEl.value,
+            height: optHeaderHeightEl.value,
+          },
+        };
+      }
+
+      settingsButtonEl.addEventListener('click', openSettingsModal);
+      settingsCancelButtonEl.addEventListener('click', closeSettingsModal);
+      settingsModalEl.addEventListener('click', (event) => {
+        if (event.target === settingsModalEl) {
+          closeSettingsModal();
+        }
+      });
+
+      settingsSaveButtonEl.addEventListener('click', () => {
+        const nextOptions = collectProjectOptionsFromForm();
+        settingsSaveButtonEl.disabled = true;
+        settingsCancelButtonEl.disabled = true;
+
+        google.script.run
+          .withSuccessHandler((config) => {
+            currentConfig = config;
+            preferredBaseColumnKey = '';
+            if (latestServerResponse) {
+              latestServerResponse.config = config;
+            }
+            renderCurrentView();
+            closeSettingsModal();
+            settingsSaveButtonEl.disabled = false;
+            settingsCancelButtonEl.disabled = false;
+            setStatus('');
+          })
+          .withFailureHandler((error) => {
+            settingsSaveButtonEl.disabled = false;
+            settingsCancelButtonEl.disabled = false;
+            setStatus(error && error.message ? error.message : 'Failed to save project options.', true);
+          })
+          .saveProjectOptions(nextOptions);
       });
 
       function startPolling() {

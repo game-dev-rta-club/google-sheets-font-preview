@@ -1,27 +1,140 @@
+var PROJECT_OPTIONS_PROPERTY_KEY = 'GoogleSheetsFontPreview.ProjectOptions';
+
+function cloneJson_(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function normalizeHeaderName_(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
+}
+
+function getDefaultProjectOptions_() {
+  return cloneJson_(getFontPreviewConfig_().projectOptions);
+}
+
+function getStoredProjectOptions_() {
+  var raw = PropertiesService.getDocumentProperties().getProperty(PROJECT_OPTIONS_PROPERTY_KEY);
+  if (!raw) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(raw);
+  } catch (error) {
+    return {};
+  }
+}
+
+function sanitizeProjectOptions_(rawOptions) {
+  var defaults = getDefaultProjectOptions_();
+  var raw = rawOptions || {};
+
+  var visibleSections = raw.visibleSections || {};
+  var textDisplay = raw.textDisplay || {};
+  var languageSettings = raw.languageSettings || {};
+  var fixedStrings = raw.fixedStrings || {};
+
+  return {
+    visibleSections: {
+      screenshot: visibleSections.screenshot !== false,
+      note: visibleSections.note !== false,
+      baseLanguage: visibleSections.baseLanguage !== false,
+      localization: visibleSections.localization !== false,
+    },
+    textDisplay: {
+      defaultFontSizePx: Math.max(8, Number(textDisplay.defaultFontSizePx) || defaults.textDisplay.defaultFontSizePx),
+      fixedFontSize: Boolean(textDisplay.fixedFontSize),
+    },
+    languageSettings: {
+      defaultLanguage: String(languageSettings.defaultLanguage || defaults.languageSettings.defaultLanguage).trim() || defaults.languageSettings.defaultLanguage,
+      ignoredColumns: sanitizeIgnoredColumns_(languageSettings.ignoredColumns),
+    },
+    fixedStrings: {
+      screenshot: sanitizeFixedStringValue_(fixedStrings.screenshot, defaults.fixedStrings.screenshot),
+      note: sanitizeFixedStringValue_(fixedStrings.note, defaults.fixedStrings.note),
+      width: sanitizeFixedStringValue_(fixedStrings.width, defaults.fixedStrings.width),
+      height: sanitizeFixedStringValue_(fixedStrings.height, defaults.fixedStrings.height),
+    },
+  };
+}
+
+function sanitizeFixedStringValue_(value, fallback) {
+  var normalized = String(value || '').trim();
+  return normalized || fallback;
+}
+
+function sanitizeIgnoredColumns_(value) {
+  var values = Array.isArray(value)
+    ? value
+    : String(value || '')
+        .split(/\r?\n|,/)
+        .map(function(entry) { return entry.trim(); });
+
+  var seen = {};
+  var sanitized = [];
+  values.forEach(function(entry) {
+    if (!entry) {
+      return;
+    }
+
+    var normalized = normalizeHeaderName_(entry);
+    if (!normalized || seen[normalized]) {
+      return;
+    }
+
+    seen[normalized] = true;
+    sanitized.push(entry);
+  });
+  return sanitized;
+}
+
+function getResolvedProjectOptions_() {
+  var defaults = getDefaultProjectOptions_();
+  var stored = getStoredProjectOptions_();
+  return sanitizeProjectOptions_(Object.assign({}, defaults, stored));
+}
+
+function saveProjectOptions(options) {
+  var resolved = sanitizeProjectOptions_(options);
+  PropertiesService.getDocumentProperties().setProperty(PROJECT_OPTIONS_PROPERTY_KEY, JSON.stringify(resolved));
+  return createClientPreviewConfig_();
+}
+
 function getReservedHeaderNames_() {
-  var config = getFontPreviewConfig_();
+  var options = getResolvedProjectOptions_();
   return [
-    config.headers.screenshot,
-    config.headers.note,
-    config.headers.width,
-    config.headers.height,
+    options.fixedStrings.screenshot,
+    options.fixedStrings.note,
+    options.fixedStrings.width,
+    options.fixedStrings.height,
   ];
 }
 
 function createClientPreviewConfig_() {
   var config = getFontPreviewConfig_();
+  var options = getResolvedProjectOptions_();
+  var reservedHeaderNames = getReservedHeaderNames_();
   return {
-    screenshotHeaderName: config.headers.screenshot,
-    noteHeaderName: config.headers.note,
-    baseLanguageHeaderName: config.headers.baseLanguage,
-    widthHeaderName: config.headers.width,
-    heightHeaderName: config.headers.height,
-    reservedHeaderNames: getReservedHeaderNames_(),
+    screenshotHeaderName: options.fixedStrings.screenshot,
+    noteHeaderName: options.fixedStrings.note,
+    baseLanguageHeaderName: options.languageSettings.defaultLanguage,
+    widthHeaderName: options.fixedStrings.width,
+    heightHeaderName: options.fixedStrings.height,
+    reservedHeaderNames: reservedHeaderNames,
+    projectReservedHeaderNames: reservedHeaderNames,
+    userIgnoredColumns: options.languageSettings.ignoredColumns,
+    visibleSections: options.visibleSections,
+    defaultFontSizePx: options.textDisplay.defaultFontSizePx,
+    fixedFontSize: options.textDisplay.fixedFontSize,
     pollIntervalMs: config.timing.pollIntervalMs,
     saveDebounceMs: config.timing.saveDebounceMs,
     textFrameBaseWidthUnits: config.textFrame.baseWidthUnits,
     textFrameBaseHeightUnits: config.textFrame.baseHeightUnits,
     textFrameSizePaddingUnits: config.textFrame.sizePaddingUnits,
+    projectOptions: options,
   };
 }
 

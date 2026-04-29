@@ -5,12 +5,27 @@ var FONT_PREVIEW_CONFIG = {
     sidebarTitle: 'Localization Preview',
   },
   rowWindowRadius: 5,
-  headers: {
-    screenshot: 'screenshot',
-    note: 'note',
-    baseLanguage: 'en',
-    width: 'width',
-    height: 'height',
+  projectOptions: {
+    visibleSections: {
+      screenshot: true,
+      note: true,
+      baseLanguage: true,
+      localization: true,
+    },
+    textDisplay: {
+      defaultFontSizePx: 20,
+      fixedFontSize: false,
+    },
+    languageSettings: {
+      defaultLanguage: 'en',
+      ignoredColumns: [],
+    },
+    fixedStrings: {
+      screenshot: 'screenshot',
+      note: 'note',
+      width: 'width',
+      height: 'height',
+    },
   },
   timing: {
     pollIntervalMs: 200,
