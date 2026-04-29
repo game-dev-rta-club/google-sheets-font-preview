@@ -708,8 +708,6 @@
       let slotViews = [];
       let selectionCommitInFlight = false;
       let ignorePollResponsesThroughRequestId = 0;
-      let pollRequestInFlight = false;
-      let pollRefreshQueued = false;
       let scrollbarWidthPx = null;
       let preferredBaseColumnKey = '';
 
@@ -1771,33 +1769,15 @@
       }
 
       function requestPollRefresh() {
-        if (pollRequestInFlight) {
-          pollRefreshQueued = true;
-          return;
-        }
-
-        refreshSelection();
-      }
-
-      function finishPollRefresh() {
-        pollRequestInFlight = false;
-        if (!pollRefreshQueued) {
-          return;
-        }
-
-        pollRefreshQueued = false;
         refreshSelection();
       }
 
       function refreshSelection() {
         const requestId = ++nextRequestId;
-        pollRequestInFlight = true;
         const previewRequest = buildPreviewPollRequest();
 
         google.script.run
           .withSuccessHandler((bundle) => {
-            finishPollRefresh();
-
             const actualResponse = bundle && bundle.actualState;
             const previewResponse = bundle && bundle.previewState;
             if (!previewResponse || !previewResponse.ok) {
@@ -1841,7 +1821,6 @@
             setStatus('');
           })
           .withFailureHandler((error) => {
-            finishPollRefresh();
             setStatus(error && error.message ? error.message : 'Failed to load selected row.', true);
           })
           .getPreviewStateBundle(previewRequest);
@@ -1859,7 +1838,6 @@
           a1Notation: buildA1Notation(targetRow, internalSelection.column),
         };
         renderCurrentView();
-        requestPollRefresh();
       }
 
       moveUpButtonEl.addEventListener('click', () => {
