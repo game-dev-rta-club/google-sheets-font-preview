@@ -170,13 +170,16 @@ function showLocalizationPreviewSidebar() {
 }
 
 function createSampleSheet() {
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  if (!spreadsheet) {
+    return { ok: false, message: 'No active spreadsheet.' };
+  }
+
   var options = getResolvedProjectOptions_();
   var fixedStrings = options.fixedStrings || {};
   var defaultLanguage = String((options.languageSettings || {}).defaultLanguage || 'en').trim() || 'en';
   var languageHeaders = buildSampleLanguageHeaders_(defaultLanguage);
-  var spreadsheet = SpreadsheetApp.create('Google Sheets Font Preview Sample');
-  var sheet = spreadsheet.getSheets()[0];
-  sheet.setName('Sample');
+  var sheet = spreadsheet.insertSheet(createUniqueSampleSheetName_(spreadsheet, 'Sample'));
 
   var headers = [
     fixedStrings.screenshot,
@@ -185,10 +188,13 @@ function createSampleSheet() {
     fixedStrings.height,
   ].concat(languageHeaders);
 
-  var rows = buildSampleSheetRows_(languageHeaders);
-  sheet.getRange(1, 1, rows.length + 1, headers.length).setValues([headers].concat(rows));
+  var sampleRows = buildSampleSheetRows_(languageHeaders);
+  var values = sampleRows.map(function(entry) { return entry.values; });
+  sheet.getRange(1, 1, values.length + 1, headers.length).setValues([headers].concat(values));
+  applySampleSheetImages_(sheet, sampleRows);
   sheet.setFrozenRows(1);
-  formatSampleSheet_(sheet, headers.length, rows.length + 1);
+  formatSampleSheet_(sheet, headers.length, values.length + 1);
+  spreadsheet.setActiveSheet(sheet);
 
   var defaultLanguageColumnIndex = headers.indexOf(defaultLanguage) + 1;
   if (defaultLanguageColumnIndex > 0) {
@@ -323,7 +329,7 @@ function buildSampleSheetRows_(languageHeaders) {
 
   return entries.map(function(entry) {
     var row = [
-      '=IMAGE("' + entry.screenshotUrl + '")',
+      '',
       entry.note,
       entry.width,
       entry.height,
@@ -334,12 +340,50 @@ function buildSampleSheetRows_(languageHeaders) {
       row.push(entry.texts[normalized] || entry.texts.en || '');
     });
 
-    return row;
+    return {
+      screenshotUrl: entry.screenshotUrl,
+      values: row,
+    };
   });
 }
 
 function buildCommonsImageUrl_(fileName) {
   return 'https://commons.wikimedia.org/wiki/Special:FilePath/' + encodeURIComponent(fileName);
+}
+
+function applySampleSheetImages_(sheet, rows) {
+  rows.forEach(function(row, index) {
+    var imageUrl = row.screenshotUrl;
+    if (!imageUrl) {
+      return;
+    }
+
+    var image = SpreadsheetApp.newCellImage()
+      .setSourceUrl(imageUrl)
+      .setAltTextTitle('Sample screenshot')
+      .setAltTextDescription('Sample screenshot for Google Sheets Font Preview')
+      .build();
+
+    sheet.getRange(index + 2, 1).setValue(image);
+  });
+}
+
+function createUniqueSampleSheetName_(spreadsheet, baseName) {
+  var existingNames = {};
+  spreadsheet.getSheets().forEach(function(sheet) {
+    existingNames[sheet.getName()] = true;
+  });
+
+  if (!existingNames[baseName]) {
+    return baseName;
+  }
+
+  var index = 2;
+  while (existingNames[baseName + ' ' + index]) {
+    index += 1;
+  }
+
+  return baseName + ' ' + index;
 }
 
 function formatSampleSheet_(sheet, totalColumns, totalRows) {
