@@ -5,6 +5,7 @@ var FONT_PREVIEW_CONFIG = {
     sidebarTitle: 'Localization Preview',
   },
   rowWindowRadius: 5,
+  cacheRetentionRadius: 50,
   projectOptions: {
     visibleSections: {
       previewCell: true,

@@ -693,6 +693,7 @@
       let currentConfig = JSON.parse(JSON.stringify(BOOTSTRAP_CONFIG));
       const pollIntervalMs = BOOTSTRAP_CONFIG.pollIntervalMs;
       const saveDebounceMs = BOOTSTRAP_CONFIG.saveDebounceMs;
+      const cacheRetentionRadius = BOOTSTRAP_CONFIG.cacheRetentionRadius || 0;
 
       let nextRequestId = 0;
       let latestAcceptedRequestId = 0;
@@ -872,6 +873,16 @@
           keepKeys.add(cacheKey(sheetName, row));
         };
 
+        const addRowRange = (sheetName, centerRow) => {
+          if (!sheetName || !centerRow || cacheRetentionRadius <= 0) {
+            return;
+          }
+
+          for (let row = Math.max(2, centerRow - cacheRetentionRadius); row <= centerRow + cacheRetentionRadius; row += 1) {
+            addRow(sheetName, row);
+          }
+        };
+
         if (response) {
           addRow(response.sheetName, response.row);
           (response.rowWindow || []).forEach((rowState) => addRow(response.sheetName, rowState.row));
@@ -879,6 +890,8 @@
 
         addRow(actualSelection && actualSelection.sheetName, actualSelection && actualSelection.row);
         addRow(internalSelection && internalSelection.sheetName, internalSelection && internalSelection.row);
+        addRowRange(actualSelection && actualSelection.sheetName, actualSelection && actualSelection.row);
+        addRowRange(internalSelection && internalSelection.sheetName, internalSelection && internalSelection.row);
 
         slotStates.forEach((slotState) => {
           const target = slotState && (slotState.editLockTarget || slotState.target);

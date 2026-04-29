@@ -144,6 +144,7 @@ function createClientPreviewConfig_() {
     useSharedPreviewSize: options.textPreview.useSharedPreviewSize,
     pollIntervalMs: config.timing.pollIntervalMs,
     saveDebounceMs: config.timing.saveDebounceMs,
+    cacheRetentionRadius: config.cacheRetentionRadius,
     textFrameBaseWidthUnits: config.textFrame.baseWidthUnits,
     textFrameBaseHeightUnits: config.textFrame.baseHeightUnits,
     textFrameSizePaddingUnits: config.textFrame.sizePaddingUnits,
