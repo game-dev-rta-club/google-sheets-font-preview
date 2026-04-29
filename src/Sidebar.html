@@ -333,6 +333,7 @@
       .control-options-row {
         display: flex;
         justify-content: flex-end;
+        gap: 8px;
       }
 
       .options-card {
@@ -352,6 +353,14 @@
         min-height: 44px;
         padding: 4px 8px;
         font-size: 32px;
+        line-height: 1;
+      }
+
+      .help-button {
+        min-width: 52px;
+        min-height: 44px;
+        padding: 4px 8px;
+        font-size: 28px;
         line-height: 1;
       }
 
@@ -531,6 +540,15 @@
         justify-content: flex-end;
         gap: 8px;
       }
+
+      .help-link-row {
+        display: flex;
+        justify-content: flex-start;
+      }
+
+      .help-primary-button {
+        min-height: 40px;
+      }
     </style>
   </head>
   <body>
@@ -564,6 +582,7 @@
 
       <section id="optionsCard" class="options-card">
         <div class="control-options-row">
+          <button id="helpButton" class="help-button" type="button" aria-label="Open help">?</button>
           <button id="settingsButton" class="settings-button" type="button" aria-label="Open options">⚙</button>
         </div>
       </section>
@@ -655,6 +674,37 @@
       </div>
     </div>
 
+    <div id="helpModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+      <div class="modal-panel">
+        <h2 id="helpTitle" class="modal-title">Help</h2>
+
+        <section class="modal-section">
+          <h3>What this tool does</h3>
+          <p class="modal-copy">Google Sheets Font Preview helps you review and edit localized text while checking screenshots, notes, and text size constraints in the same sidebar. It is designed for fast spreadsheet-based copy review with real fonts.</p>
+        </section>
+
+        <section class="modal-section">
+          <h3>Try a sample sheet</h3>
+          <p class="modal-copy">Create a new spreadsheet with sample screenshot, note, width, height, and multi-language columns so you can test the sidebar format right away.</p>
+          <div class="help-link-row">
+            <button id="createSampleSheetButton" class="help-primary-button" type="button">Create Sample Sheet</button>
+          </div>
+        </section>
+
+        <section class="modal-section">
+          <h3>GitHub</h3>
+          <p class="modal-copy">Open the project page for setup notes, source code, and updates.</p>
+          <div class="help-link-row">
+            <button id="openGithubButton" type="button">Open GitHub</button>
+          </div>
+        </section>
+
+        <div class="modal-actions">
+          <button id="helpOkButton" type="button">OK</button>
+        </div>
+      </div>
+    </div>
+
     <script>
       const BOOTSTRAP_CONFIG = <?!= bootstrapConfigJson ?>;
 
@@ -670,6 +720,11 @@
       const selectButtonEl = document.getElementById('selectButton');
       const moveUpButtonEl = document.getElementById('moveUpButton');
       const moveDownButtonEl = document.getElementById('moveDownButton');
+      const helpButtonEl = document.getElementById('helpButton');
+      const helpModalEl = document.getElementById('helpModal');
+      const helpOkButtonEl = document.getElementById('helpOkButton');
+      const createSampleSheetButtonEl = document.getElementById('createSampleSheetButton');
+      const openGithubButtonEl = document.getElementById('openGithubButton');
       const settingsButtonEl = document.getElementById('settingsButton');
       const settingsModalEl = document.getElementById('settingsModal');
       const settingsCancelButtonEl = document.getElementById('settingsCancelButton');
@@ -1991,6 +2046,14 @@
         settingsModalEl.classList.remove('is-open');
       }
 
+      function openHelpModal() {
+        helpModalEl.classList.add('is-open');
+      }
+
+      function closeHelpModal() {
+        helpModalEl.classList.remove('is-open');
+      }
+
       function collectProjectOptionsFromForm() {
         return {
           visibleSections: {
@@ -2017,6 +2080,43 @@
           },
         };
       }
+
+      helpButtonEl.addEventListener('click', openHelpModal);
+      helpOkButtonEl.addEventListener('click', closeHelpModal);
+      helpModalEl.addEventListener('click', (event) => {
+        if (event.target === helpModalEl) {
+          closeHelpModal();
+        }
+      });
+
+      createSampleSheetButtonEl.addEventListener('click', () => {
+        createSampleSheetButtonEl.disabled = true;
+        setStatus('');
+
+        google.script.run
+          .withSuccessHandler((result) => {
+            createSampleSheetButtonEl.disabled = false;
+            if (!result || result.ok === false || !result.url) {
+              setStatus(result && result.message ? result.message : 'Failed to create sample sheet.', true);
+              return;
+            }
+
+            window.open(result.url, '_blank', 'noopener');
+            setStatus('Sample sheet created.');
+          })
+          .withFailureHandler((error) => {
+            createSampleSheetButtonEl.disabled = false;
+            setStatus(error && error.message ? error.message : 'Failed to create sample sheet.', true);
+          })
+          .createSampleSheet();
+      });
+
+      openGithubButtonEl.addEventListener('click', () => {
+        const githubUrl = currentConfig && currentConfig.githubUrl;
+        if (githubUrl) {
+          window.open(githubUrl, '_blank', 'noopener');
+        }
+      });
 
       settingsButtonEl.addEventListener('click', openSettingsModal);
       [optHeaderScreenshotEl, optHeaderNoteEl, optHeaderWidthEl, optHeaderHeightEl].forEach((input) => {

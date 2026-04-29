@@ -3,6 +3,7 @@ var FONT_PREVIEW_CONFIG = {
     menuName: 'Localization',
     menuItemName: 'Font Preview',
     sidebarTitle: 'Localization Preview',
+    githubUrl: 'https://github.com/game-dev-rta-club/google-sheets-font-preview',
   },
   rowWindowRadius: 8,
   cacheRetentionRadius: 50,
