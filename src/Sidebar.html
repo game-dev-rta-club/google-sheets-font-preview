@@ -1239,13 +1239,21 @@
           return '';
         }
 
+        const widthColumn = findColumnByNormalizedLabel(columns, normalizeLabel(config.widthHeaderName));
+        const heightColumn = findColumnByNormalizedLabel(columns, normalizeLabel(config.heightHeaderName));
+
         const messages = [];
-        if (!findColumnByNormalizedLabel(columns, normalizeLabel(config.widthHeaderName))) {
+        if (!widthColumn) {
           messages.push(`Add a "${config.widthHeaderName}" column to match the real width.`);
         }
-        if (!findColumnByNormalizedLabel(columns, normalizeLabel(config.heightHeaderName))) {
+        if (!heightColumn) {
           messages.push(`Add a "${config.heightHeaderName}" column to match the real height.`);
         }
+
+        if ((widthColumn && widthColumn.isLoading) || (heightColumn && heightColumn.isLoading)) {
+          return '';
+        }
+
         return messages.join('\n');
       }
 

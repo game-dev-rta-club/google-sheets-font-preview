@@ -31,7 +31,7 @@ var FONT_PREVIEW_CONFIG = {
     },
   },
   timing: {
-    pollIntervalMs: 200,
+    pollIntervalMs: 300,
     saveDebounceMs: 350,
   },
   textFrame: {
