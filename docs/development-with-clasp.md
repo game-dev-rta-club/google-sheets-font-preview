@@ -58,6 +58,12 @@ npx github:game-dev-rta-club/google-sheets-font-preview push-clasp
 - If you are the developer of the target sheet or Apps Script project, continue with your developer account and approve the requested access.
 - `push-clasp` uploads the local `src/` files in your current working folder. It does not fetch the latest repository files automatically.
 
+## Maintainer resources
+
+Production Apps Script management spreadsheet:
+
+- <https://docs.google.com/spreadsheets/d/1RXvbx0FDQm0sOkM-KyZiOXSSXRt4qzh0erU6QdNlUsc/edit?gid=0#gid=0>
+
 ## Project files
 
 - `src/Config.gs`: user-editable settings
