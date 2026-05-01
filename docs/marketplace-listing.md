@@ -34,12 +34,12 @@ The tool can also use `width` and `height` columns to preview text inside size-a
 
 ## Suggested links
 
-Replace these with final public URLs before Marketplace submission.
+Use the GitHub Pages URLs for Marketplace and OAuth configuration.
 
-- Homepage: `https://github.com/game-dev-rta-club/google-sheets-font-preview`
-- Support: `https://github.com/game-dev-rta-club/google-sheets-font-preview/blob/main/SUPPORT.md`
-- Privacy policy: `https://github.com/game-dev-rta-club/google-sheets-font-preview/blob/main/PRIVACYPOLICY.md`
-- Terms of service: `https://github.com/game-dev-rta-club/google-sheets-font-preview/blob/main/TERMS.md`
+- Homepage: `https://game-dev-rta-club.github.io/google-sheets-font-preview/`
+- Support: `https://game-dev-rta-club.github.io/google-sheets-font-preview/support`
+- Privacy policy: `https://game-dev-rta-club.github.io/google-sheets-font-preview/privacy`
+- Terms of service: `https://game-dev-rta-club.github.io/google-sheets-font-preview/terms`
 
 ## OAuth and permissions notes
 

@@ -60,6 +60,14 @@ npx github:game-dev-rta-club/google-sheets-font-preview push-clasp
 
 ## Maintainer resources
 
+Public GitHub Pages site:
+
+- <https://game-dev-rta-club.github.io/google-sheets-font-preview/>
+
+GitHub Pages setup notes:
+
+- [GitHub Pages](github-pages.md)
+
 Production Apps Script management spreadsheet:
 
 - <https://docs.google.com/spreadsheets/d/1RXvbx0FDQm0sOkM-KyZiOXSSXRt4qzh0erU6QdNlUsc/edit?gid=0#gid=0>

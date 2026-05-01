@@ -10,6 +10,7 @@ This project currently uses a manual release flow. The goal is to keep releases 
 - Check whether screenshots need to be updated.
 - If screenshots need updates, use the source slide deck linked from `docs/marketplace-assets/README.md`.
 - Confirm the production Apps Script management spreadsheet linked from `docs/development-with-clasp.md` points to the intended release project.
+- Confirm the GitHub Pages URLs in `docs/github-pages.md` are live and match the Marketplace/OAuth settings.
 
 ## Verify locally
 
@@ -62,9 +63,9 @@ If publishing as a Marketplace app, also verify:
 
 - OAuth consent screen information is current.
 - Marketplace listing text and screenshots are current.
-- Privacy policy URL points to `PRIVACYPOLICY.md` or a stable published copy.
-- Terms of service URL points to `TERMS.md` or a stable published copy.
-- Support/contact URL points to the GitHub repository or a dedicated support page.
+- Privacy policy URL points to the GitHub Pages privacy page.
+- Terms of service URL points to the GitHub Pages terms page.
+- Support/contact URL points to the GitHub Pages support page.
 - Marketplace icon and banner assets are current.
 - Requested scopes are still the minimum needed for the feature set.
 
