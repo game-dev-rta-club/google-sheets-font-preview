@@ -4,7 +4,7 @@ This document collects the information needed when preparing a Google Workspace 
 
 ## App basics
 
-- App name: Google Sheet Font Preview
+- App name: Font Preview Sidebar
 - Google Workspace app: Google Sheets
 - Category: Productivity
 - Pricing: Free
@@ -17,7 +17,7 @@ Preview and edit Google Sheets text with local fonts, screenshots, notes, and si
 
 ## Detailed description / 詳細な説明
 
-Google Sheet Font Preview helps localization, translation, and copy review teams work directly inside Google Sheets while checking how text looks with real local fonts.
+Font Preview Sidebar helps localization, translation, and copy review teams work directly inside Google Sheets while checking how text looks with real local fonts.
 
 Use the sidebar to preview and edit spreadsheet text, drag and drop font files from your computer, compare base language and localized text, and review screenshot or note context from the same row.
 

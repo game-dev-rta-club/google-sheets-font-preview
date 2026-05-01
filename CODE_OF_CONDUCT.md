@@ -2,7 +2,7 @@
 
 ## Our pledge
 
-We want Google Sheet Font Preview to be a welcoming project for people with different backgrounds, languages, experience levels, and perspectives.
+We want Font Preview Sidebar to be a welcoming project for people with different backgrounds, languages, experience levels, and perspectives.
 
 Contributors and maintainers are expected to participate with respect, patience, and care.
 

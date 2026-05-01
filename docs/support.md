@@ -1,6 +1,6 @@
 # Support
 
-Thanks for using Google Sheet Font Preview.
+Thanks for using Font Preview Sidebar.
 
 ## Where to get help
 

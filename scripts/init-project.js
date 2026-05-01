@@ -39,7 +39,7 @@ function copyFile(sourcePath, targetPath) {
 
 function main() {
   console.log('');
-  console.log('Initializing Google Sheet Font Preview in:');
+  console.log('Initializing Font Preview Sidebar in:');
   console.log(projectRoot);
   console.log('');
 

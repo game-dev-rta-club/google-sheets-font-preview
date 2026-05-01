@@ -349,7 +349,7 @@ function applySampleSheetImages_(sheet, rows, screenshotColumnIndex) {
     var image = SpreadsheetApp.newCellImage()
       .setSourceUrl(imageUrl)
       .setAltTextTitle('Sample screenshot')
-      .setAltTextDescription('Sample screenshot for Google Sheet Font Preview')
+      .setAltTextDescription('Sample screenshot for Font Preview Sidebar')
       .build();
 
     sheet.getRange(index + 2, screenshotColumnIndex).setValue(image);

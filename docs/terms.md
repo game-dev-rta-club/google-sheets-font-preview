@@ -2,11 +2,11 @@
 
 Last updated: May 1, 2026
 
-These Terms of Service apply to Google Sheet Font Preview.
+These Terms of Service apply to Font Preview Sidebar.
 
 ## Use of the tool
 
-Google Sheet Font Preview is provided as an open source Google Apps Script tool for previewing and editing spreadsheet text with local fonts.
+Font Preview Sidebar is provided as an open source Google Apps Script tool for previewing and editing spreadsheet text with local fonts.
 
 You are responsible for:
 
