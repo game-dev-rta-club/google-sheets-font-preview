@@ -6,7 +6,7 @@ This project currently uses a manual release flow. The goal is to keep releases 
 
 - Review merged changes since the last release.
 - Confirm README and docs still match the current UI.
-- Confirm `PRIVACYPOLICY.md`, `SECURITY.md`, and marketplace-facing links are still accurate.
+- Confirm `PRIVACYPOLICY.md`, `TERMS.md`, `SECURITY.md`, and marketplace-facing links are still accurate.
 - Check whether screenshots need to be updated.
 
 ## Verify locally
@@ -61,7 +61,9 @@ If publishing as a Marketplace app, also verify:
 - OAuth consent screen information is current.
 - Marketplace listing text and screenshots are current.
 - Privacy policy URL points to `PRIVACYPOLICY.md` or a stable published copy.
+- Terms of service URL points to `TERMS.md` or a stable published copy.
 - Support/contact URL points to the GitHub repository or a dedicated support page.
+- Marketplace icon and banner assets are current.
 - Requested scopes are still the minimum needed for the feature set.
 
 Marketplace publishing and review are intentionally manual for now.

@@ -82,6 +82,8 @@ For contribution details, see [docs/contributing.md](docs/contributing.md).
 Project policies:
 
 - [Privacy Policy](PRIVACYPOLICY.md)
+- [Terms of Service](TERMS.md)
+- [Support](SUPPORT.md)
 - [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Security Policy](SECURITY.md)
 - [Release checklist](docs/release-checklist.md)
