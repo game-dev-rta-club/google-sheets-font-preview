@@ -11,16 +11,11 @@ This folder contains draft assets for a future Google Workspace Marketplace list
 
 ## Screenshot candidates
 
-The README images in `docs/images/` are useful product screenshots, but Marketplace screenshots should be exported in an accepted Marketplace size before submission.
+The README images in `docs/images/` are also Marketplace screenshot candidates.
 
-Recommended submission target:
+Current screenshot size:
 
 - `1280x800`
-
-Other accepted sizes may include:
-
-- `640x400`
-- `2560x1600`
 
 ## Notes
 
