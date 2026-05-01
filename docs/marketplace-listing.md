@@ -11,11 +11,11 @@ This document collects the information needed when preparing a Google Workspace 
 - Language: English
 - Support: GitHub support page and issues
 
-## Short description
+## Short description / 簡単な説明
 
 Preview and edit Google Sheets text with local fonts, screenshots, notes, and size-aware text areas.
 
-## Detailed description
+## Detailed description / 詳細な説明
 
 Google Sheet Font Preview helps localization, translation, and copy review teams work directly inside Google Sheets while checking how text looks with real local fonts.
 
