@@ -79,6 +79,13 @@ Contributions are welcome.
 
 For contribution details, see [docs/contributing.md](docs/contributing.md).
 
+Project policies:
+
+- [Privacy Policy](PRIVACYPOLICY.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Security Policy](SECURITY.md)
+- [Release checklist](docs/release-checklist.md)
+
 ## License
 
 MIT. See [LICENSE](LICENSE).
