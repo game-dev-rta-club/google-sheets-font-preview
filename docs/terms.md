@@ -13,6 +13,7 @@ You are responsible for:
 - the spreadsheets and content you use with the tool
 - complying with your organization's rules and applicable laws
 - confirming that you have the right to use any local fonts, screenshots, notes, or spreadsheet data
+- reviewing spreadsheet edits made through the sidebar before relying on the results
 
 ## No warranty
 

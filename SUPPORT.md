@@ -32,4 +32,4 @@ Please do not include private spreadsheet data, secrets, credentials, or proprie
 
 For security issues, please follow [SECURITY.md](SECURITY.md).
 
-For privacy information, please see [PRIVACYPOLICY.md](PRIVACYPOLICY.md).
+For privacy information, please see the [Privacy Policy](docs/privacy.md).
