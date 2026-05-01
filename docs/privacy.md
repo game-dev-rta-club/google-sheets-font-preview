@@ -2,7 +2,7 @@
 
 Last updated: May 1, 2026
 
-Google Sheets Font Preview is a Google Apps Script tool that runs inside Google Sheets. This policy explains what information the tool uses and how it is handled.
+Google Sheet Font Preview is a Google Apps Script tool that runs inside Google Sheets. This policy explains what information the tool uses and how it is handled.
 
 ## Spreadsheet data the tool uses
 

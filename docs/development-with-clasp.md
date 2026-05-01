@@ -1,6 +1,6 @@
 # Development with clasp
 
-This guide is for people who want to develop or maintain Google Sheets Font Preview from a local checkout.
+This guide is for people who want to develop or maintain Google Sheet Font Preview from a local checkout.
 
 ## Quick flow
 

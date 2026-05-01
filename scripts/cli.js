@@ -13,7 +13,7 @@ const { main: setupClasp } = require('./setup-clasp');
 
 function printUsage() {
   console.log('');
-  console.log('Google Sheets Font Preview CLI');
+  console.log('Google Sheet Font Preview CLI');
   console.log('');
   console.log('Commands:');
   console.log('  setup-clasp   Copy project files, create .clasp.json, and start clasp login setup');
