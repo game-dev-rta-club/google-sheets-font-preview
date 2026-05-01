@@ -17,8 +17,13 @@ Current screenshot size:
 
 - `1280x800`
 
+Source slide deck for creating and updating screenshots:
+
+- <https://docs.google.com/presentation/d/1zzqT_dhpB6-MCxgkT36zeMxxWCELbAMR2GIB6u_hD1s>
+
 ## Notes
 
 - Keep images free of private spreadsheet data.
+- Export updated screenshots from the source slide deck when possible.
 - Prefer screenshots that show the sidebar next to a realistic sheet.
 - Update screenshots whenever the UI changes significantly.

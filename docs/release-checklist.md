@@ -8,6 +8,7 @@ This project currently uses a manual release flow. The goal is to keep releases 
 - Confirm README and docs still match the current UI.
 - Confirm `PRIVACYPOLICY.md`, `TERMS.md`, `SECURITY.md`, and marketplace-facing links are still accurate.
 - Check whether screenshots need to be updated.
+- If screenshots need updates, use the source slide deck linked from `docs/marketplace-assets/README.md`.
 
 ## Verify locally
 
