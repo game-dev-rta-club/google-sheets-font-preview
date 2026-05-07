@@ -1,4 +1,4 @@
-# Font Preview Sidebar
+# Google Sheets Font Preview Sidebar
 
 Font Preview Sidebar is a Google Apps Script sidebar for reviewing and editing large amounts of text in **Google Sheets** while previewing it with **real local font files**.
 
