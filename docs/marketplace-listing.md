@@ -38,12 +38,12 @@ Open a spreadsheet, reload the tab if needed, then choose `Localization > Font P
 
 ## Suggested links
 
-Use the GitHub Pages URLs for Marketplace and OAuth configuration.
+Use the custom-domain GitHub Pages URLs for Marketplace and OAuth configuration.
 
-- Homepage: `https://game-dev-rta-club.github.io/google-sheets-font-preview/`
-- Support: `https://game-dev-rta-club.github.io/google-sheets-font-preview/support`
-- Privacy policy: `https://game-dev-rta-club.github.io/google-sheets-font-preview/privacy`
-- Terms of service: `https://game-dev-rta-club.github.io/google-sheets-font-preview/terms`
+- Homepage: `https://font-preview-sidebar.game-dev-rta.com/`
+- Support: `https://font-preview-sidebar.game-dev-rta.com/support`
+- Privacy policy: `https://font-preview-sidebar.game-dev-rta.com/privacy`
+- Terms of service: `https://font-preview-sidebar.game-dev-rta.com/terms`
 
 ## OAuth and permissions notes
 

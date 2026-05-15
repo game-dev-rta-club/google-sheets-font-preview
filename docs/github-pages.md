@@ -1,6 +1,6 @@
 # GitHub Pages
 
-This project uses GitHub Pages as the public website for Marketplace and OAuth configuration.
+This project uses GitHub Pages with a custom domain as the public website for Marketplace and OAuth configuration.
 
 ## Pages settings
 
@@ -14,14 +14,14 @@ Enable GitHub Pages in the repository settings:
 
 Expected public URLs:
 
-- Homepage: `https://game-dev-rta-club.github.io/google-sheets-font-preview/`
-- Privacy Policy: `https://game-dev-rta-club.github.io/google-sheets-font-preview/privacy`
-- Terms of Service: `https://game-dev-rta-club.github.io/google-sheets-font-preview/terms`
-- Support: `https://game-dev-rta-club.github.io/google-sheets-font-preview/support`
+- Homepage: `https://font-preview-sidebar.game-dev-rta.com/`
+- Privacy Policy: `https://font-preview-sidebar.game-dev-rta.com/privacy`
+- Terms of Service: `https://font-preview-sidebar.game-dev-rta.com/terms`
+- Support: `https://font-preview-sidebar.game-dev-rta.com/support`
 
 ## Marketplace and OAuth usage
 
-Use the GitHub Pages URLs for:
+Use the custom-domain GitHub Pages URLs for:
 
 - OAuth consent screen homepage
 - OAuth consent screen privacy policy
@@ -29,4 +29,4 @@ Use the GitHub Pages URLs for:
 - Google Workspace Marketplace privacy policy URL
 - Google Workspace Marketplace terms of service URL
 
-If the project later uses a custom domain, update this file, `docs/marketplace-listing.md`, and `docs/release-checklist.md`.
+If the custom domain changes, update this file, `docs/marketplace-listing.md`, and `docs/release-checklist.md`.

@@ -62,7 +62,7 @@ npx github:game-dev-rta-club/google-sheets-font-preview push-clasp
 
 Public GitHub Pages site:
 
-- <https://game-dev-rta-club.github.io/google-sheets-font-preview/>
+- <https://font-preview-sidebar.game-dev-rta.com/>
 
 GitHub Pages setup notes:
 
