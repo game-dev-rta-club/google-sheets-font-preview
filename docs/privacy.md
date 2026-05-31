@@ -1,6 +1,6 @@
 # Privacy Policy
 
-Last updated: May 15, 2026
+Last updated: May 31, 2026
 
 Font Preview Sidebar is a Google Apps Script tool that runs inside Google Sheets. This policy explains what information the tool uses and how it is handled.
 
@@ -39,6 +39,18 @@ Font Preview Sidebar does not send spreadsheet data to an external server contro
 Project options are stored only in the current spreadsheet's Apps Script document properties. Local font files are used in your browser session for preview purposes and are not uploaded to an external server controlled by this project.
 
 The tool does not share Google user data with third parties except as necessary for Google Sheets and Google Apps Script to provide the service.
+
+## Google user data retention and deletion
+
+Font Preview Sidebar does not store copies of Google Sheets data on an external server controlled by this project.
+
+Spreadsheet content remains in the user's Google spreadsheet until the user edits or deletes it in Google Sheets. When the user deletes spreadsheet content, deletes a sheet, or deletes the spreadsheet, that data is deleted according to Google's data retention and deletion practices.
+
+Project options are stored in the current spreadsheet's Apps Script document properties. These options remain available while the spreadsheet and add-on configuration remain available. Users can change project options from the add-on's Options screen, remove the add-on or script configuration, or delete the spreadsheet.
+
+Local font files are loaded in the user's browser session for preview purposes. They are not uploaded to an external server controlled by this project and are not retained by this project after the browser session ends.
+
+Because this project does not operate an external backend server, the maintainers do not have remote access to user spreadsheets and cannot directly delete spreadsheet data on a user's behalf. Users control deletion of their Google Sheets data through Google Sheets and their Google Account.
 
 ## Limited use
 
