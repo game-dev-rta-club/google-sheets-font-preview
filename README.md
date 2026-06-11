@@ -4,6 +4,8 @@ Font Preview Sidebar is a Google Apps Script sidebar for reviewing and editing l
 
 It is useful for localization, translation review, font-aware copy checking, and any workflow where people need to compare spreadsheet text with its actual visual look before using it in an app, website, game, document, or other product.
 
+Install from the [Google Workspace Marketplace](https://workspace.google.com/marketplace/app/font_preview_sidebar/418269014567).
+
 ## Features
 
 ### Review and edit text with real fonts in a Google Sheets sidebar
@@ -32,9 +34,13 @@ Use `screenshot` and `note` columns to show extra context needed for translation
 
 ## Quick Start
 
+### Install from Google Workspace Marketplace
+
+Install [Font Preview Sidebar from Google Workspace Marketplace](https://workspace.google.com/marketplace/app/font_preview_sidebar/418269014567), then open a spreadsheet and choose `Extensions > Localization > Font Preview`.
+
 ### Use with `clasp`
 
-This is the recommended setup.
+This setup is useful for local development or custom forks.
 
 1. Clone this repository.
 2. Install dependencies:
