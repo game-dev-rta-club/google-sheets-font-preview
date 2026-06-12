@@ -5,7 +5,7 @@ This document collects the information needed when preparing a Google Workspace 
 ## App basics
 
 - App name: Font Preview Sidebar
-- Google Workspace app: Google Sheets
+- Google Workspace app: Google Sheets™
 - Category: Productivity
 - Pricing: Free
 - Language: English
@@ -13,23 +13,27 @@ This document collects the information needed when preparing a Google Workspace 
 
 ## Short description / 簡単な説明
 
-Preview and edit Google Sheets text with local fonts, screenshots, notes, and size-aware text areas.
+Review, edit, and fit localized text in Google Sheets™ with real fonts, screenshots, and notes.
 
 ## Detailed description / 詳細な説明
 
-Font Preview Sidebar helps localization, translation, and copy review teams work directly inside Google Sheets while checking how text looks with real local fonts.
+Font Preview Sidebar helps teams review, edit, and fit localized text directly in Google Sheets™ before it is used in an app, website, game, document, or other product.
 
-Use the sidebar to preview and edit spreadsheet text, drag and drop font files from your computer, compare base language and localized text, and review screenshot or note context from the same row.
+Spreadsheet text is easy to manage, but hard to judge visually. This add-on adds a sidebar where you can preview text with local font files, compare base language and localized text, and edit cells without leaving the sheet.
 
-The tool can also use `width` and `height` columns to preview text inside size-aware areas, making it easier to catch overflow, missing glyphs, and visual fit problems before text is used in an app, website, game, document, or other product.
+Use optional `screenshot` and `note` columns to keep translation context next to each row. Use optional `width` and `height` columns to preview whether text fits in the intended display area and to catch overflow, missing glyphs, or font issues earlier.
+
+This app is free to use and does not require a paid subscription.
+
+Google Sheets™ is a trademark of Google LLC.
 
 ## Post-installation hint
 
-Open a spreadsheet, reload the tab if needed, then choose `Localization > Font Preview` to open the sidebar. Use the Help button to create a sample sheet and try the format.
+Open or reload a spreadsheet, then choose `Extensions > Localization > Font Preview`. Use the Help button to create a sample sheet.
 
 ## Key features
 
-- Google Sheets sidebar for font-aware text review and editing
+- Google Sheets™ sidebar for font-aware text review and editing
 - Local font drag and drop for `.ttf`, `.otf`, `.woff`, and `.woff2`
 - Optional `width` and `height` columns for size-aware previews
 - Optional `screenshot` and `note` columns for translator context
@@ -51,7 +55,7 @@ The app should request only the scopes needed for the current feature set. Revie
 
 Likely scope needs:
 
-- Displaying sidebar UI in Google Sheets
+- Displaying sidebar UI in Google Sheets™
 - Reading and writing the current spreadsheet
 - Saving project options for the current spreadsheet
 
@@ -65,6 +69,23 @@ Store listing assets live in [marketplace-assets](marketplace-assets/README.md).
 - App icon `128x128`
 - Card banner `220x140`
 - Marketplace screenshots in accepted sizes
+
+## Screenshot improvement notes
+
+The current screenshots are accepted-size Marketplace assets. For the next conversion-focused update, prioritize the first screenshot because it acts as the storefront hero image.
+
+Recommended first screenshot message:
+
+```text
+Review spreadsheet text as it will actually appear
+```
+
+Recommended direction:
+
+- show a realistic Google Sheets™ spreadsheet and the sidebar together
+- reduce large red arrows and annotation-heavy overlays
+- make the selected row and sidebar preview relationship clear
+- keep later screenshots focused on font drag and drop, real-time editing, and screenshot/note context
 
 ## Pre-submission checks
 
